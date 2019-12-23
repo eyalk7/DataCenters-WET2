@@ -2,12 +2,12 @@
 #define DATACENTERS_WET2_UNIONFIND_H
 #include "HashTable.h"
 
-typedef DataCenter* Set;
+typedef int Set;
 
 struct UnionFindCell {
     int parent;
     int size;
-    Set dataCenter;
+    Set element;
 };
 
 class UnionFind {

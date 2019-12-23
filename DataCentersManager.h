@@ -25,7 +25,8 @@ public:
 
 private:
     HashTable servers;
-    UnionFind dataCenters;
+    UnionFind dataCentersIDs;
+    DataCenter* dataCenters;
 
 };
 
