@@ -7,7 +7,7 @@ typedef int Set;
 struct UnionFindCell {
     int parent;
     int size;
-    Set element;
+    Set dataCenterID;
 };
 
 class UnionFind {
