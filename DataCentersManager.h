@@ -9,11 +9,7 @@ enum ManagerResult {
 
 };
 
-class DataCenter {
-    ///...
-private:
-    HashTable* servers;
-};
+typedef HashTable* DataCenter;
 
 class DataCentersManager {
 public:
@@ -24,8 +20,9 @@ public:
     ManagerResult SetTraffic(ServerID serverID, int traffic);
 
 private:
-    HashTable servers;
-    UnionFind dataCenters;
+    HashTable* servers;
+    UnionFind* ids;
+    DataCenter* dataCenters;
 
 };
 
