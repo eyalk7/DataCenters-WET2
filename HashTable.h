@@ -2,13 +2,11 @@
 #define DATACENTERS_WET2_HASHTABLE_H
 #include "DataCentersManager.h"
 
-enum HashTableResult {};
-
-struct ServerNode {
-    ServerID serverID;
-    DataCenterID dataCenterID;
-    int traffic;
-    ServerNode* next;
+enum HashTableResult {
+    HASH_SUCCESS,
+    HASH_ALLOCATION_ERROR,
+    HASH_ALREADY_EXIST,
+    HASH_NOT_EXIST
 };
 
 class HashTable {
@@ -20,12 +18,17 @@ public:
     HashTableResult SetTraffic(ServerID serverID, int traffic)
 
 private:
-    ServerNode** servers;
+    struct Node {
+        server* data;
+        Node* next;
+    };
+
+    Node** lists;
     int elemCount, size;
 
-    static int HashFunc(ServerID id);
+    int HashFunc(ServerID id);
     void CheckAndResize();
-    static HashTable mergeWith(const HashTable& a, const HashTable& b);
+    static HashTable merge(const HashTable& a, const HashTable& b);
 };
 
 #endif //DATACENTERS_WET2_HASHTABLE_H

@@ -6,7 +6,10 @@
 typedef int ServerID;
 typedef int DataCenterID;
 enum ManagerResult {
-
+    M_SUCCESS = 0,
+    M_FAILURE = -1,
+    M_ALLOCATION_ERROR = -2,
+    M_INVALID_INPUT = -3
 };
 
 typedef HashTable* DataCenter;
@@ -20,9 +23,16 @@ public:
     ManagerResult SetTraffic(ServerID serverID, int traffic);
 
 private:
+    struct Server {
+        ServerID serverID;
+        DataCenterID dataCenterID;
+        int traffic;
+    };
+
     HashTable* servers;
     UnionFind* ids;
     DataCenter* dataCenters;
+    int dataCenterNum;
 
 };
 
