@@ -6,7 +6,7 @@ typedef int Set;
 
 class UnionFind {
 public:
-    UnionFind(int size);
+    explicit UnionFind(int size);
     Set Find(int idx);
     Set Union(Set a, Set b);
     int GetIdx(Set set);

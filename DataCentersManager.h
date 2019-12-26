@@ -13,14 +13,21 @@ enum ManagerResult {
 };
 
 typedef HashTable* DataCenter;
+/* SWTICH TO THIS:
+class DataCenter {
+    HashTable* servers;
+    // add AVL tree of servers
+};
+*/
 
 class DataCentersManager {
 public:
-    DataCentersManager(int size);
+    explicit DataCentersManager(int size);
     ManagerResult MergeDataCenters(DataCenterID dataCenter1, DataCenterID dataCenter2);
     ManagerResult AddServer(DataCenterID dataCenterID, ServerID serverID);
     ManagerResult RemoveServer(ServerID serverID);
     ManagerResult SetTraffic(ServerID serverID, int traffic);
+    ManagerResult SumHighestTrafficServers(DataCenterID dataCenterID, int k, int* traffic);
 
 private:
     struct Server {

@@ -37,3 +37,7 @@ ManagerResult DataCentersManager::SetTraffic(ServerID serverID, int traffic) {
     // get the "Server" in servers
     // update the "traffic"
 }
+
+ManagerResult DataCentersManager::SumHighestTrafficServers(DataCenterID dataCenterID, int k, int* traffic) {
+
+}
