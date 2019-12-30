@@ -12,11 +12,17 @@ enum ManagerResult {
     M_INVALID_INPUT = -3
 };
 
+struct Server {
+    ServerID serverID;
+    DataCenterID dataCenterID;
+    int traffic;
+};
+
 typedef HashTable* DataCenter;
 /* SWTICH TO THIS:
 class DataCenter {
     HashTable* servers;
-    // add AVL tree of servers
+    // add AVL rank tree of servers
 };
 */
 
@@ -30,11 +36,6 @@ public:
     ManagerResult SumHighestTrafficServers(DataCenterID dataCenterID, int k, int* traffic);
 
 private:
-    struct Server {
-        ServerID serverID;
-        DataCenterID dataCenterID;
-        int traffic;
-    };
 
     HashTable* servers;
     UnionFind* ids;
