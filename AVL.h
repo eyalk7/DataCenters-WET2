@@ -8,13 +8,14 @@ using namespace std;
 enum AVLResult { AVL_SUCCESS, AVL_FAILURE, AVL_INVALID_INPUT, AVL_ALREADY_EXIST, AVL_NOT_EXIST };
 
 template <class KeyType, class DataType>
-struct TreeNode {
+class DefTreeNode {
+public:
     KeyType key;
     DataType data;
-    TreeNode* parent, * left, * right;
+    DefTreeNode* parent, * left, * right;
     int height;
 
-    TreeNode(KeyType key,
+    DefTreeNode(KeyType key,
              DataType data,
              TreeNode* parent = nullptr) :
             key(key), data(data),
@@ -28,10 +29,10 @@ struct TreeNode {
     bool hasTwoSons() const;
     void updateHeight();
 
-    static void swap(TreeNode& A, TreeNode& B);
+    static void swap(DefTreeNode& A, DefTreeNode& B);
 };
 
-template <class KeyType, class DataType>
+template <class KeyType, class DataType, class TreeNode = DefTreeNode>
 class AVL {
 public:
     class TreeIterator {
