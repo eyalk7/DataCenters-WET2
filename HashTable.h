@@ -22,11 +22,12 @@ enum HashTableResult {
 template <class DataType>
 class HashTable {
 public:
-    HashTable();
+    HashTable() : HashTable(INITIAL_SIZE) {}
     ~HashTable();
     DataType& Find(int key);
     HashTableResult Insert(int key, DataType data);
     HashTableResult Delete(int key);
+    static HashTable Merge(const HashTable& table1, const HashTable& table2);
 
 private:
     struct Node {
@@ -51,9 +52,11 @@ private:
     int size, elemCount;
     List* lists;
 
-    int HashFunc(int key);
+    explicit HashTable(int size) : size(size), elemCount(0) { InitializeArray(size); }
+    int HashFunc(int key) { return (key % size); }
     void CheckAndResize();
-    static HashTable Merge(const HashTable& table1, const HashTable& table2);
+    void InitializeArray(int size);
+    void InsertAllElements(const HashTable& other);
 };
 
 //--------------------------- LIST FUNCTIONS -----------------------
@@ -119,22 +122,11 @@ HashTableResult HashTable<DataType>::List::Remove(int key) {
 
     return HASH_SUCCESS;
 }
-
-
 //--------------------------- HASH TABLE FUNCTIONS -----------------------
-
-
-template<class DataType>
-HashTable<DataType>::HashTable() : size(INITIAL_SIZE), elemCount(0) {
-    lists = new List[INITIAL_SIZE];
-    for (int i = 0; i < INITIAL_SIZE; i++)
-        lists[i] = new List();
-}
-
 template<class DataType>
 HashTable<DataType>::~HashTable() {
     for (int i = 0; i < size; i++) {
-        Node* ptr = lists[i];
+        Node* ptr = lists[i].first;
         while (ptr != nullptr) {
             Node* to_delete = ptr;
             ptr = ptr->next;
@@ -171,57 +163,63 @@ HashTableResult HashTable<DataType>::Delete(int key) {
 }
 
 template<class DataType>
-int HashTable<DataType>::HashFunc(int key) {
-    //return modulo size of array
-    return (key % size);
+HashTable<DataType> HashTable<DataType>::Merge(const HashTable<DataType>& table1, const HashTable<DataType>& table2) {
+    int count1 = table1.elemCount;
+    int count2 = table2.elemCount;
+    int new_size = RESIZE_FACTOR * (count1 + count2);
+
+    HashTable* new_table = new HashTable(new_size);
+    new_table->InsertAllElements(table1);
+    new_table->InsertAllElements(table2);
+
+    return *new_table;
 }
+
+//--------------------------- PRIVATE TABLE FUNCTIONS -----------------------
 
 template<class DataType>
 void HashTable<DataType>::CheckAndResize() {
-
+    // check if need to resize
     int new_size = size;
     if (elemCount == GROW_FACTOR * size) {
         new_size =  size * RESIZE_FACTOR;
 
     } else if (elemCount == SHRINK_FACTOR * size) {
         new_size = size / RESIZE_FACTOR;
-    } else return; // There is no need to resize
+    } else return; // no need to resize
 
-    List* new_table = new List[new_size];
-    for (int i = 0; i < new_size; i++)
-        new_table[i] = new List();
+    // make a copy of this table
+    auto old_table = new HashTable(size);
+    old_table->InsertAllElements(this);
 
-    // update table and size
-    List* old_table = lists;
-    lists = new_table;
-    int old_size = size;
+    ~HashTable();               // delete the List array
     size = new_size;
+    InitializeArray(new_size);  // create new List Array
 
-    // insert elements to new table
-    for (int i = 0; i < old_size; i++) {
-        List list = old_table[i];
+    InsertAllElements(old_table); // Insert back all the elements
+
+    delete old_table;
+}
+
+template<class DataType>
+void HashTable<DataType>::InitializeArray(int size) {
+    lists = new List[size];
+    for (int i = 0; i < size; i++)
+        lists[i] = new List();
+}
+
+
+template<class DataType>
+void HashTable<DataType>::InsertAllElements(const HashTable& other) {
+    List* other_table = other.lists;
+    for (int i = 0; i < other.size; i++) {
+        List list = other_table[i];
         Node* ptr = list.first;
         while (ptr != nullptr) {
             Insert(ptr->key, ptr->data);
             ptr = ptr->next;
         }
     }
-
-    delete[] old_table;
-}
-
-template<class DataType>
-HashTable<DataType> HashTable<DataType>::Merge(const HashTable<DataType>& table1, const HashTable<DataType>& table2) {
-    int count1 = table1.elemCount;
-    int count2 = table2.elemCount;
-    int new_size = RESIZE_FACTOR * (count1 + count2);
-
-    HashTable retVal = new HashTable();
-    // RESIZE(NEW_SIZE)
-
-
-    // allocate new hash (size of two tables)
-    //  insert elements
 }
 
 #endif //DATACENTERS_WET2_HASHTABLE_H
