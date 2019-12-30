@@ -12,17 +12,24 @@ enum ManagerResult {
     M_INVALID_INPUT = -3
 };
 
+struct Server {
+    ServerID serverID;
+    DataCenterID dataCenterID;
+    int traffic;
+};
+
 typedef HashTable* DataCenter;
 /* SWTICH TO THIS:
 class DataCenter {
     HashTable* servers;
-    // add AVL tree of servers
+    // add AVL rank tree of servers
 };
 */
 
 class DataCentersManager {
 public:
     explicit DataCentersManager(int size);
+    ~DataCentersManager();
     ManagerResult MergeDataCenters(DataCenterID dataCenter1, DataCenterID dataCenter2);
     ManagerResult AddServer(DataCenterID dataCenterID, ServerID serverID);
     ManagerResult RemoveServer(ServerID serverID);
@@ -30,11 +37,6 @@ public:
     ManagerResult SumHighestTrafficServers(DataCenterID dataCenterID, int k, int* traffic);
 
 private:
-    struct Server {
-        ServerID serverID;
-        DataCenterID dataCenterID;
-        int traffic;
-    };
 
     HashTable* servers;
     UnionFind* ids;

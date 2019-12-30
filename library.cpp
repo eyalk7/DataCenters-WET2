@@ -15,13 +15,21 @@ void* Init(int n) {
 StatusType MergeDataCenters(void *DS, int dataCenter1, int dataCenter2) {
     if (!DS || dataCenter1 <= 0 || dataCenter2 <= 0) return INVALID_INPUT;
     auto manager = (DataCentersManager*)DS;
-    return (StatusType)(manager->MergeDataCenters(dataCenter1, dataCenter2));
+    try {
+        return (StatusType)(manager->MergeDataCenters(dataCenter1, dataCenter2));
+    } catch (std::bad_alloc& ba) {
+        return ALLOCATION_ERROR;
+    }
 }
 
 StatusType AddServer(void *DS, int dataCenterID, int serverID) {
     if (!DS || dataCenterID <= 0 || serverID <= 0) return INVALID_INPUT;
     auto manager = (DataCentersManager*)DS;
-    return (StatusType)(manager->AddServer(dataCenterID, serverID));
+    try {
+        return (StatusType)(manager->AddServer(dataCenterID, serverID));
+    } catch (std::bad_alloc& ba) {
+        return ALLOCATION_ERROR;
+    }
 }
 
 StatusType RemoveServer(void *DS, int serverID) {
@@ -33,7 +41,11 @@ StatusType RemoveServer(void *DS, int serverID) {
 StatusType SetTraffic(void *DS, int serverID,  int traffic) {
     if (!DS || serverID <= 0 || traffic < 0) return INVALID_INPUT;
     auto manager = (DataCentersManager*)DS;
-    return (StatusType)(manager->SetTraffic(serverID));
+    try {
+        return (StatusType)(manager->SetTraffic(serverID, traffic));
+    } catch (std::bad_alloc& ba) {
+        return ALLOCATION_ERROR;
+    }
 }
 
 StatusType SumHighestTrafficServers(void *DS, int dataCenterID,  int k, int *traffic) {
