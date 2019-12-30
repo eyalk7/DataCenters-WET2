@@ -133,14 +133,14 @@ HashTable<DataType>::HashTable() : size(INITIAL_SIZE), elemCount(0) {
 
 template<class DataType>
 HashTable<DataType>::~HashTable() {
-/*    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         Node* ptr = lists[i];
         while (ptr != nullptr) {
             Node* to_delete = ptr;
             ptr = ptr->next;
             delete to_delete;
         }
-    }*/
+    }
 
     delete[] lists;
 }
@@ -212,11 +212,12 @@ void HashTable<DataType>::CheckAndResize() {
 
 template<class DataType>
 HashTable<DataType> HashTable<DataType>::Merge(const HashTable<DataType>& table1, const HashTable<DataType>& table2) {
-    int size1 = table1.size;
-    int size2 = table2.size;
-    int size = size1 + size2;
+    int count1 = table1.elemCount;
+    int count2 = table2.elemCount;
+    int new_size = RESIZE_FACTOR * (count1 + count2);
 
     HashTable retVal = new HashTable();
+    // RESIZE(NEW_SIZE)
 
 
     // allocate new hash (size of two tables)
