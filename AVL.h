@@ -2,6 +2,8 @@
 #define DATACENTERS_WET1_AVL_H
 
 #include <iostream>
+#include "ServerRankTree.h"
+
 using namespace std;
 #define COUNT 10 // used in tree print function
 
@@ -47,7 +49,6 @@ public:
 
         friend AVL;
 
-    private:
         TreeNode curr, * last;
     };
 

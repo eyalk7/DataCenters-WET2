@@ -28,9 +28,10 @@ private:
     void rotateRight(RankTreeNode* root);
     void rotateLeft(RankTreeNode* root);
     static ServerRankTree MakeEmptyTree(int size);
-    void InitRanks()
+    static RankTreeNode* MakeEmptyTreeHelp(int height);
+    void InitRanks();
     static int log(int n);
-
+    static int pow(int base, int power);
 };
 
 #endif //DATACENTERS_WET2_SERVERRANKTREE_H

@@ -1,21 +1,44 @@
 #include "ServerRankTree.h"
 
-static ServerRankTree MergeRankTrees(const ServerRankTree& a, const ServerRankTree& b) {
-    // alocate two array of "Server" class in size of the trees
+ServerRankTree ServerRankTree::MergeRankTrees(const ServerRankTree& a, const ServerRankTree& b) {
+    int newTreeSize = a.getSize()+b.getSize();
+    // allocate two array of "Server" class in size of the two trees
+    auto helperArray = new Server[newTreeSize];
+
     // do inorder on both trees and fill the array in accending order
+    auto aIter = a.begin(), bIter = b.begin();
+    int i=0;
+    for (; aIter != a.end() && bIter != b.end(); i++) {
+        if (aIter < bIter) {
+            helperArray[i] = *aIter;
+        } else {
+            helperArray[i] = *bIter;
+        }
+    }
+
+    for (; aIter != a.end(); i++) helperArray[i] = *aIter;
+    for (; bIter != b.end(); i++) helperArray[i] = *bIter;
 
     // call MakeEmptyTree
+    auto newTree = MakeEmptyTree(newTreeSize);
 
     // do inorder and fill the empty tree
+    auto iter = newTree.begin();
+    for (int i=0; iter != newTree.end(); i++, iter++) {
+        *iter = helperArray[i];
+    }
 
     // call InitRanks
+    newTree.InitRanks();
 
-    // free the arrays
+    // free the array
+    free(helperArray);
 
     // return tree
+    return newTree;
 }
 
-int SumHighestTrafficServers(int k) {
+int ServerRankTree::SumHighestTrafficServers(int k) {
     // if all tree is <= k return all tree traffic
 
 
@@ -29,46 +52,57 @@ int SumHighestTrafficServers(int k) {
         // k = k - right subtree - 1
 }
 
-void fixTree(RankTreeNode* root) {
+void ServerRankTree::fixTree(RankTreeNode* root) {
 
 }
 
-void rotateRight(RankTreeNode* root) {
+void ServerRankTree::rotateRight(RankTreeNode* root) {
 
 }
 
-void rotateLeft(RankTreeNode* root) {
+void ServerRankTree::rotateLeft(RankTreeNode* root) {
 
 }
 
-static ServerRankTree MakeEmptyTree(int size) {
+ServerRankTree ServerRankTree::MakeEmptyTree(int size) {
     // RankTreeNode root = MakeEmptyTreeHelp(log(size))
+    int newTreeHeight = log(size);
+    RankTreeNode* root = MakeEmptyTreeHelp(newTreeHeight);
+
     // size of the full tree is pow(2,log(size)+1)-1
+    int newTreeSize = pow(2, newTreeHeight+1) - 1;
+
     // construct new tree and dummy->left = root;
+    ServerRankTree newTree;
+    newTree.dummyRoot->left = root;
 
     // go backward inorder, and delete fullSize - size leaves:
         // go to father and put nullptr
         // free the leaf "and let it back into nature" (daniel rabinovitch)
+    auto iter = newTree.Rbegin();
+    while (newTreeSize > size) {
+        auto curr = iter.curr;
+    }
     // size of tree = size
 
     // return the tree
 }
 
-static RankTreeNode* MakeEmptyTreeHelp(int height) {
+RankTreeNode* ServerRankTree::MakeEmptyTreeHelp(int height) {
      // create myself (RankTreeNode with Server with garbage values)
      // myself->left = MakeEmptyTreeHelp(height-1)
      // kanal for right
      // return yourself
 }
 
-void InitRanks() {
+void ServerRankTree::InitRanks() {
 
 }
 
-static int log(int n) {
+int ServerRankTree::log(int n) {
     // log ceiling (daniel rabinovitch)
 }
 
-static int pow(int base, int power) {
+int ServerRankTree::pow(int base, int power) {
 
 }
