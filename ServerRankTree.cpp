@@ -1,5 +1,18 @@
 #include "ServerRankTree.h"
 
+typedef DefTreeNode<ServerKey, Server> BaseNode;
+
+//-------------------- RANK TREE NODE FUNCTIONS --------------------
+void RankTreeNode::UpdateRanks() {
+    if (BaseNode::isLeaf()) {
+        subTreeTraffic = data.traffic;
+        subTreeSize = 1;
+    }
+}
+
+
+//-------------------- RANK TREE FUNCTIONS --------------------
+
 static ServerRankTree MergeRankTrees(const ServerRankTree& a, const ServerRankTree& b) {
     // alocate two array of "Server" class in size of the trees
     // do inorder on both trees and fill the array in accending order

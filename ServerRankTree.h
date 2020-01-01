@@ -4,7 +4,7 @@
 #include "AVL.h"
 #include "DataCentersManager.h"
 
-struct ServerKey {
+struct ServerKey
     int traffic;
     ServerID serverId;
 };
@@ -12,8 +12,10 @@ struct ServerKey {
 class RankTreeNode : public DefTreeNode<ServerKey, Server> {
 public:
     int subTreeSize, subTreeTraffic;
-//    RankTreeNode(int traffic) : DefTreeNode<ServerKey, Server>(ServerKey, data,
-//            TreeNode* parent = nullptr) :) daniel is loser
+
+    RankTreeNode(ServerKey key, Server data, RankTreeNode* parent = nullptr)
+    : DefTreeNode(key, data, parent), subTreeSize(1), subTreeTraffic(data.traffic) {}
+
     void UpdateRanks();
 };
 

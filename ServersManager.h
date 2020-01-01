@@ -12,8 +12,6 @@ enum ServersManagerResult {
     SM_INVALID_INPUT = -3
 };
 
-typedef int DataCenterID;
-typedef int ServerID;
 struct Server {
     ServerID serverID;
     DataCenterID dataCenterID;

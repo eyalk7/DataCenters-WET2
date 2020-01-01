@@ -2,6 +2,8 @@
 #define DATACENTERS_WET1_AVL_H
 
 #include <iostream>
+#include "ServerRankTree.h"
+
 using namespace std;
 #define COUNT 10 // used in tree print function
 
@@ -17,7 +19,7 @@ public:
 
     DefTreeNode(KeyType key,
              DataType data,
-             TreeNode* parent = nullptr) :
+             DefTreeNode* parent = nullptr) :
             key(key), data(data),
             parent(parent), left(nullptr), right(nullptr),
             height(0) {};
@@ -46,9 +48,8 @@ public:
         bool operator!=(const TreeIterator& other) const;
 
         friend AVL;
-
-    private:
-        TreeNode curr, * last;
+    protected:
+        TreeNode *curr, * last;
     };
 
     AVL();
@@ -68,7 +69,7 @@ protected:
     TreeNode* dummyRoot;
     int size;
 
-    virtual void fixTree(TreeNode root);
+    virtual void fixTree(TreeNode* root);
     void BalanceSubTree(TreeNode* root);
     virtual void rotateRight(TreeNode* root);
     virtual void rotateLeft(TreeNode* root);
@@ -79,17 +80,17 @@ protected:
 
 //-------------------------AVL FUNCTIONS-------------------------
 
-template <class KeyType, class DataType>
-AVL<KeyType, DataType>::AVL() : size(0) {
+template <class KeyType, class DataType, class TreeNode>
+AVL<KeyType, DataType, TreeNode>::AVL() : size(0) {
     dummyRoot = new TreeNode(KeyType(), DataType());
 }
 
-template <class KeyType, class DataType>
-AVL<KeyType, DataType>::~AVL() {
+template <class KeyType, class DataType, class TreeNode>
+AVL<KeyType, DataType, TreeNode>::~AVL() {
     if (size != 0) {
         TreeIterator iter = begin();
         auto ptr = iter.curr;
-        TreeNode<KeyType, DataType>* last = nullptr;
+        TreeNode* last = nullptr;
 
         // PostOrder Traversal to delete all nodes
         while (ptr != dummyRoot) {
@@ -121,9 +122,9 @@ AVL<KeyType, DataType>::~AVL() {
     delete dummyRoot;
 }
 
-template <class KeyType, class DataType>
-typename AVL<KeyType, DataType>::TreeIterator AVL<KeyType, DataType>::find(const KeyType& key) const {
-    auto ptr = dummyRoot->left;
+template <class KeyType, class DataType, class TreeNode>
+typename AVL<KeyType, DataType, TreeNode>::TreeIterator AVL<KeyType, DataType, TreeNode>::find(const KeyType& key) const {
+    TreeNode* ptr = dummyRoot->left;
 
     while (ptr != nullptr && key != ptr->key) {
         if (key < ptr->key) {
@@ -143,8 +144,8 @@ typename AVL<KeyType, DataType>::TreeIterator AVL<KeyType, DataType>::find(const
     return iter;
 }
 
-template <class KeyType, class DataType>
-AVLResult AVL<KeyType, DataType>::insert(const KeyType& key, const DataType& data) {
+template <class KeyType, class DataType, class TreeNode>
+AVLResult AVL<KeyType, DataType, TreeNode>::insert(const KeyType& key, const DataType& data) {
     if (size != 0) {
         auto last = dummyRoot;
         auto ptr = dummyRoot->left;
@@ -163,7 +164,7 @@ AVLResult AVL<KeyType, DataType>::insert(const KeyType& key, const DataType& dat
             return AVL_ALREADY_EXIST;    // key is already in the tree
 
         // Add the new node:
-        ptr = new TreeNode<KeyType, DataType>(key, data, last);
+        ptr = new TreeNode(key, data, last);
         if (key < last->key) {
             last->left = ptr;
         } else {
@@ -176,15 +177,15 @@ AVLResult AVL<KeyType, DataType>::insert(const KeyType& key, const DataType& dat
     else
     {
         // tree is empty
-        dummyRoot->left = new TreeNode<KeyType, DataType>(key, data, dummyRoot);
+        dummyRoot->left = new TreeNode(key, data, dummyRoot);
     }
 
     size++;
     return AVL_SUCCESS;
 }
 
-template <class KeyType, class DataType>
-AVLResult AVL<KeyType, DataType>::remove(const KeyType& key) {
+template <class KeyType, class DataType, class TreeNode>
+AVLResult AVL<KeyType, DataType, TreeNode>::remove(const KeyType& key) {
     if (size == 0)
         return AVL_SUCCESS;
 
@@ -200,12 +201,12 @@ AVLResult AVL<KeyType, DataType>::remove(const KeyType& key) {
         auto next = iter.curr;
 
         // swap the two nodes
-        TreeNode<KeyType, DataType>::swap(*to_delete, *next);
+        TreeNode::swap(*to_delete, *next);
 
         to_delete = next; // update pointer of node to be removed
     }
 
-    TreeNode<KeyType, DataType>* son = nullptr;
+    TreeNode* son = nullptr;
     if (to_delete->hasSingleSon()) {
         // find which is the single son
         son = to_delete->left;
@@ -234,8 +235,8 @@ AVLResult AVL<KeyType, DataType>::remove(const KeyType& key) {
     return AVL_SUCCESS;
 }
 
-template <class KeyType, class DataType>
-typename AVL<KeyType, DataType>::TreeIterator AVL<KeyType, DataType>::begin() const {
+template <class KeyType, class DataType, class TreeNode>
+typename AVL<KeyType, DataType, TreeNode>::TreeIterator AVL<KeyType, DataType, TreeNode>::begin() const {
     // go all the way left
     TreeIterator iter;
     iter.curr = dummyRoot;
@@ -248,41 +249,42 @@ typename AVL<KeyType, DataType>::TreeIterator AVL<KeyType, DataType>::begin() co
     return iter;
 }
 
-typename AVL<KeyType, DataType>::TreeIterator AVL<KeyType, DataType>::Rbegin() const {
-    // go all the way left
+template <class KeyType, class DataType, class TreeNode>
+typename AVL<KeyType, DataType, TreeNode>::TreeIterator AVL<KeyType, DataType, TreeNode>::Rbegin() const {
+    // go all the way right
     TreeIterator iter;
-    iter.curr = dummyRoot;
+    iter.curr = dummyRoot->left;
 
-    while (iter.curr->left != nullptr) {
-        iter.curr = iter.curr->left;
+    while (iter.curr->right != nullptr) {
+        iter.curr = iter.curr->right;
     }
     iter.last = iter.curr->parent;
 
     return iter;
 }
 
-template <class KeyType, class DataType>
-typename AVL<KeyType, DataType>::TreeIterator AVL<KeyType, DataType>::end() const {
+template <class KeyType, class DataType, class TreeNode>
+typename AVL<KeyType, DataType, TreeNode>::TreeIterator AVL<KeyType, DataType, TreeNode>::end() const {
     // dummy
     TreeIterator iter;
     iter.curr = dummyRoot;
     return iter;
 }
 
-template <class KeyType, class DataType>
-int AVL<KeyType, DataType>::getSize() const {
+template <class KeyType, class DataType, class TreeNode>
+int AVL<KeyType, DataType, TreeNode>::getSize() const {
     return size;
 }
 
-template<class KeyType, class DataType>
-void AVL<KeyType, DataType>::printTree() {
+template <class KeyType, class DataType, class TreeNode>
+void AVL<KeyType, DataType, TreeNode>::printTree() {
     printTreeHelp(dummyRoot->left, 0);
 }
 
 //-------------------------PRIVATE AVL FUNCTIONS-------------------------
 
-template <class KeyType, class DataType>
-virtual void AVL<KeyType, DataType>::fixTree(TreeNode<KeyType, DataType>* root) {
+template <class KeyType, class DataType, class TreeNode>
+void AVL<KeyType, DataType, TreeNode>::fixTree(TreeNode* root) {
     while (root != dummyRoot) {
         root->updateHeight();
         BalanceSubTree(root);
@@ -290,8 +292,8 @@ virtual void AVL<KeyType, DataType>::fixTree(TreeNode<KeyType, DataType>* root) 
     }
 }
 
-template <class KeyType, class DataType>
-void AVL<KeyType, DataType>::BalanceSubTree(TreeNode<KeyType, DataType>* root) {
+template <class KeyType, class DataType, class TreeNode>
+void AVL<KeyType, DataType, TreeNode>::BalanceSubTree(TreeNode* root) {
     if (root == nullptr || root == dummyRoot)
         return;
 
@@ -322,8 +324,8 @@ void AVL<KeyType, DataType>::BalanceSubTree(TreeNode<KeyType, DataType>* root) {
     }
 }
 
-template <class KeyType, class DataType>
-virtual void AVL<KeyType, DataType>::rotateRight(TreeNode<KeyType, DataType>* root) {
+template <class KeyType, class DataType, class TreeNode>
+void AVL<KeyType, DataType, TreeNode>::rotateRight(TreeNode* root) {
     if (root == nullptr || root == dummyRoot)
         return;
 
@@ -353,8 +355,8 @@ virtual void AVL<KeyType, DataType>::rotateRight(TreeNode<KeyType, DataType>* ro
     B->updateHeight();
 }
 
-template <class KeyType, class DataType>
-virtual void AVL<KeyType, DataType>::rotateLeft(TreeNode<KeyType, DataType>* root) {
+template <class KeyType, class DataType, class TreeNode>
+void AVL<KeyType, DataType, TreeNode>::rotateLeft(TreeNode* root) {
     if (root == nullptr || root == dummyRoot)
         return;
 
@@ -384,8 +386,8 @@ virtual void AVL<KeyType, DataType>::rotateLeft(TreeNode<KeyType, DataType>* roo
     B->updateHeight();
 }
 
-template<class KeyType, class DataType>
-void AVL<KeyType, DataType>::printTreeHelp(TreeNode<KeyType, DataType>* root, int space) {
+template <class KeyType, class DataType, class TreeNode>
+void AVL<KeyType, DataType, TreeNode>::printTreeHelp(TreeNode* root, int space) {
     // Base case
     if (root == nullptr)
         return;
@@ -408,14 +410,14 @@ void AVL<KeyType, DataType>::printTreeHelp(TreeNode<KeyType, DataType>* root, in
 }
 
 //-------------------------AVL TREE ITERATOR FUNCTIONS-------------------------
-template <class KeyType, class DataType>
-DataType& AVL<KeyType, DataType>::TreeIterator::operator*() const {
+template <class KeyType, class DataType, class TreeNode>
+DataType& AVL<KeyType, DataType, TreeNode>::TreeIterator::operator*() const {
     // assert(curr->parent != nullptr); // can't dereference the dummy
     return (curr->data);
 }
 
-template <class KeyType, class DataType>
-const typename AVL<KeyType, DataType>::TreeIterator AVL<KeyType, DataType>::TreeIterator::operator++(int) {
+template <class KeyType, class DataType, class TreeNode>
+const typename AVL<KeyType, DataType, TreeNode>::TreeIterator AVL<KeyType, DataType, TreeNode>::TreeIterator::operator++(int) {
     // check if reached end (dummyNode) before ++
     if (curr->parent == nullptr)
         return *this;
@@ -450,68 +452,38 @@ const typename AVL<KeyType, DataType>::TreeIterator AVL<KeyType, DataType>::Tree
 }
 
 
-template <class KeyType, class DataType>
-const typename AVL<KeyType, DataType>::TreeIterator AVL<KeyType, DataType>::TreeIterator::operator--(int) {
-    // check if reached end (dummyNode) before ++
-    if (curr->parent == nullptr)
-        return *this;
+template <class KeyType, class DataType, class TreeNode>
+const typename AVL<KeyType, DataType, TreeNode>::TreeIterator AVL<KeyType, DataType, TreeNode>::TreeIterator::operator--(int) {
 
-    // doSomething(curr) was done
-
-    // if a right subtree exists
-    if (curr->right != nullptr) {
-        last = curr;
-        curr = curr->right; // go right
-
-        // and then go left as much as possible
-        while (curr->left != nullptr) {
-            last = curr;
-            curr = curr->left;
-        }
-    }
-    else {
-        // no right subtree exists
-        last = curr;
-        curr = curr->parent; // go up
-
-        // if you came back from a right subtree
-        // keep rising until you come back from a left subtree
-        while (last == curr->right) {
-            last = curr;
-            curr = curr->parent;
-        }
-    }
-
-    return *this;   // doSomething(curr) will be done
 }
 
 
-template <class KeyType, class DataType>
-bool AVL<KeyType, DataType>::TreeIterator::operator<(const TreeIterator& other) const {
-    if (this.curr == dummyRoot)
+template <class KeyType, class DataType, class TreeNode>
+bool AVL<KeyType, DataType, TreeNode>::TreeIterator::operator<(const TreeIterator& other) const {
+    if (this->curr->parent == nullptr)
         return false; // if this is the end
 
-    if (other == end())
+    if (other.curr->parent == nullptr)
         return true; // everything is smaller than the end
 
     // compare keys with key's operator <
     return (curr->key < other.curr->key);
 }
 
-template <class KeyType, class DataType>
-bool AVL<KeyType, DataType>::TreeIterator::operator==(const TreeIterator& other) const {
+template <class KeyType, class DataType, class TreeNode>
+bool AVL<KeyType, DataType, TreeNode>::TreeIterator::operator==(const TreeIterator& other) const {
     return (curr == other.curr);
 }
 
-template <class KeyType, class DataType>
-bool AVL<KeyType, DataType>::TreeIterator::operator!=(const TreeIterator& other) const {
+template <class KeyType, class DataType, class TreeNode>
+bool AVL<KeyType, DataType, TreeNode>::TreeIterator::operator!=(const TreeIterator& other) const {
     return !operator==(other);
 }
 
 
 //-------------------------TREE NODE FUNCTIONS-------------------------
 template <class KeyType, class DataType>
-int TreeNode<KeyType, DataType>::getBalanceFactor() const {
+int DefTreeNode<KeyType, DataType>::getBalanceFactor() const {
     int left_height = -1, right_height = -1;
 
     if (left != nullptr) {
@@ -525,27 +497,27 @@ int TreeNode<KeyType, DataType>::getBalanceFactor() const {
 }
 
 template <class KeyType, class DataType>
-bool TreeNode<KeyType, DataType>::isLeftSubtree() const {
+bool DefTreeNode<KeyType, DataType>::isLeftSubtree() const {
     return (parent->left == this);
 }
 
 template <class KeyType, class DataType>
-bool TreeNode<KeyType, DataType>::isLeaf() const {
+bool DefTreeNode<KeyType, DataType>::isLeaf() const {
     return (left == nullptr && right == nullptr);
 }
 
 template <class KeyType, class DataType>
-bool TreeNode<KeyType, DataType>::hasTwoSons() const {
+bool DefTreeNode<KeyType, DataType>::hasTwoSons() const {
     return (left != nullptr && right != nullptr);
 }
 
 template <class KeyType, class DataType>
-bool TreeNode<KeyType, DataType>::hasSingleSon() const {
+bool DefTreeNode<KeyType, DataType>::hasSingleSon() const {
     return (!isLeaf() && !hasTwoSons());
 }
 
 template<class KeyType, class DataType>
-void TreeNode<KeyType, DataType>::updateHeight() {
+void DefTreeNode<KeyType, DataType>::updateHeight() {
     if (isLeaf()) {
         height = 0;
         return;
@@ -565,7 +537,7 @@ void TreeNode<KeyType, DataType>::updateHeight() {
 }
 
 template<class KeyType, class DataType>
-void TreeNode<KeyType, DataType>::swap(TreeNode<KeyType, DataType>& A, TreeNode<KeyType, DataType>& B) {
+void DefTreeNode<KeyType, DataType>::swap(DefTreeNode<KeyType, DataType>& A, DefTreeNode<KeyType, DataType>& B) {
     KeyType temp_key = A.key;
     DataType temp_data = A.data;
 
