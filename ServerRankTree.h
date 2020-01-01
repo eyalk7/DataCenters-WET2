@@ -12,6 +12,9 @@ struct ServerKey {
 class RankTreeNode : public DefTreeNode<ServerKey, Server> {
 public:
     int subTreeSize, subTreeTraffic;
+//    RankTreeNode(int traffic) : DefTreeNode<ServerKey, Server>(ServerKey, data,
+//            TreeNode* parent = nullptr) :) daniel is loser
+    void UpdateRanks();
 };
 
 class ServerRankTree : public AVL<ServerKey, Server, RankTreeNode> {

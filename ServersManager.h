@@ -5,6 +5,13 @@
 #include "ServerRankTree.h"
 #include "DataCentersManager.h"
 
+enum ServersManagerResult {
+    SM_SUCCESS = 0,
+    SM_FAILURE = -1,
+    SM_ALLOCATION_ERROR = -2,
+    SM_INVALID_INPUT = -3
+};
+
 typedef int DataCenterID;
 typedef int ServerID;
 struct Server {
@@ -15,11 +22,12 @@ struct Server {
 
 class ServerManager {
 public:
-    ManagerResult MergeServers(DataCenterID dataCenter1, DataCenterID dataCenter2);
-    ManagerResult AddServer(DataCenterID dataCenterID, ServerID serverID);
-    ManagerResult RemoveServer(ServerID serverID);
-    ManagerResult SetTraffic(ServerID serverID, int traffic);
-    ManagerResult SumHighestTrafficServers(DataCenterID dataCenterID, int k, int* traffic);
+    ServersManagerResult AddServer(DataCenterID dataCenterID, ServerID serverID);
+    ServersManagerResult RemoveServer(ServerID serverID);
+    ServersManagerResult SetTraffic(ServerID serverID, int traffic);
+    int SumHighestTrafficServers(int k);
+    DataCenterID GetDataCenterID(ServerID serverID);
+    static ServersManagerResult MergeServers(const ServerManager& a, const ServerManager& b);
 private:
     HashTable<Server> servers;
     ServerRankTree trafficTree;

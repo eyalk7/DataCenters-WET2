@@ -27,8 +27,8 @@ public:
 
 private:
 
-    ServerManager* servers;
-    UnionFind* ids;
+    ServerManager servers;
+    UnionFind ids;
     DataCenter* dataCenters;
     int dataCenterNum;
 
