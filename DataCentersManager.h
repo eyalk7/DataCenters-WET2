@@ -29,6 +29,7 @@ class DataCenter {
 class DataCentersManager {
 public:
     explicit DataCentersManager(int size);
+    ~DataCentersManager();
     ManagerResult MergeDataCenters(DataCenterID dataCenter1, DataCenterID dataCenter2);
     ManagerResult AddServer(DataCenterID dataCenterID, ServerID serverID);
     ManagerResult RemoveServer(ServerID serverID);
