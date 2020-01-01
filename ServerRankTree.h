@@ -16,8 +16,17 @@ public:
 
 class ServerRankTree : public AVL<ServerKey, Server, RankTreeNode> {
 public:
+    ServerRankTree() = default;
+    static ServerRankTree MergeRankTrees(const ServerRankTree& a, const ServerRankTree& b);
+    int SumHighestTrafficServers(int k);
 
 private:
+    void fixTree(RankTreeNode* root);
+    void rotateRight(RankTreeNode* root);
+    void rotateLeft(RankTreeNode* root);
+    static ServerRankTree MakeEmptyTree(int size);
+    void InitRanks()
+    static int log(int n);
 
 };
 

@@ -2,6 +2,7 @@
 #define DATACENTERS_WET2_DATACENTERSMANAGER_H
 #include "HashTable.h"
 #include "UnionFind.h"
+#include "ServersManager.h"
 
 typedef int ServerID;
 typedef int DataCenterID;
@@ -12,19 +13,7 @@ enum ManagerResult {
     M_INVALID_INPUT = -3
 };
 
-struct Server {
-    ServerID serverID;
-    DataCenterID dataCenterID;
-    int traffic;
-};
-
-typedef HashTable* DataCenter;
-/* SWTICH TO THIS:
-class DataCenter {
-    HashTable* servers;
-    // add AVL rank tree of servers
-};
-*/
+typedef ServerManager* DataCenter;
 
 class DataCentersManager {
 public:
@@ -38,7 +27,7 @@ public:
 
 private:
 
-    HashTable* servers;
+    ServerManager* servers;
     UnionFind* ids;
     DataCenter* dataCenters;
     int dataCenterNum;
