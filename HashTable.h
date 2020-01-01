@@ -56,6 +56,7 @@ private:
     int HashFunc(int key) { return (key % size); }
     void CheckAndResize();
     void InitializeArray(int size);
+    void DestroyArray();
     void InsertAllElements(const HashTable& other);
 };
 
@@ -125,16 +126,7 @@ HashTableResult HashTable<DataType>::List::Remove(int key) {
 //--------------------------- HASH TABLE FUNCTIONS -----------------------
 template<class DataType>
 HashTable<DataType>::~HashTable() {
-    for (int i = 0; i < size; i++) {
-        Node* ptr = lists[i].first;
-        while (ptr != nullptr) {
-            Node* to_delete = ptr;
-            ptr = ptr->next;
-            delete to_delete;
-        }
-    }
-
-    delete[] lists;
+    DestroyArray();
 }
 
 template<class DataType>
@@ -150,7 +142,9 @@ HashTableResult HashTable<DataType>::Insert(int key, DataType data) {
     List list = lists[index];
     if (list.Find(key) != nullptr) return HASH_ALREADY_EXIST;
     elemCount++;
-    return list.AddFirst(key, data);
+    HashTableResult result = list.AddFirst(key, data);
+    CheckAndResize();
+    return result;
 }
 
 template<class DataType>
@@ -159,7 +153,9 @@ HashTableResult HashTable<DataType>::Delete(int key) {
     List list = lists[index];
     if (list.size == 0) return HASH_NOT_EXIST;
     elemCount--;
-    return list.Remove(key);
+    HashTableResult  result = list.Remove(key);
+    CheckAndResize();
+    return result;
 }
 
 template<class DataType>
@@ -192,7 +188,7 @@ void HashTable<DataType>::CheckAndResize() {
     auto old_table = new HashTable(size);
     old_table->InsertAllElements(this);
 
-    ~HashTable();               // delete the List array
+    DestroyArray();               // delete the List array
     size = new_size;
     InitializeArray(new_size);  // create new List Array
 
@@ -208,6 +204,19 @@ void HashTable<DataType>::InitializeArray(int size) {
         lists[i] = new List();
 }
 
+template<class DataType>
+void HashTable<DataType>::DestroyArray() {
+    for (int i = 0; i < size; i++) {
+        Node* ptr = lists[i].first;
+        while (ptr != nullptr) {
+            Node* to_delete = ptr;
+            ptr = ptr->next;
+            delete to_delete;
+        }
+    }
+
+    delete[] lists;
+}
 
 template<class DataType>
 void HashTable<DataType>::InsertAllElements(const HashTable& other) {

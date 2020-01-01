@@ -289,7 +289,6 @@ void AVL<KeyType, DataType>::BalanceSubTree(TreeNode<KeyType, DataType>* root) {
         else if (BF_left == -1) {
             // LR
             rotateLeft(root->left);
-            //root->left->updateHeight();
             rotateRight(root);
         }
     }
@@ -302,12 +301,9 @@ void AVL<KeyType, DataType>::BalanceSubTree(TreeNode<KeyType, DataType>* root) {
         else if (BF_right == 1) {
             // RL
             rotateRight(root->right);
-            //root->right->updateHeight();
             rotateLeft(root);
         }
     }
-
-    //root->updateHeight();
 }
 
 template <class KeyType, class DataType>
