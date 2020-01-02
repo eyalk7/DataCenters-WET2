@@ -2,10 +2,10 @@
 #define DATACENTERS_WET2_DATACENTERSMANAGER_H
 #include "HashTable.h"
 #include "UnionFind.h"
-#include "ServersManager.h"
 
 typedef int ServerID;
 typedef int DataCenterID;
+
 enum ManagerResult {
     M_SUCCESS = 0,
     M_FAILURE = -1,

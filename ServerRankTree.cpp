@@ -1,5 +1,43 @@
 #include "ServerRankTree.h"
 
+//-------------------- SERVER KEY IMPLEMENTATION --------------------
+
+bool ServerKey::operator<(const ServerKey& other) const {
+    if (traffic == other.traffic)
+        return serverId < other.serverId;
+    return traffic < other.traffic;
+}
+
+//-------------------- RANK TREE NODE IMPLEMENTATION --------------------
+
+void RankTreeNode::updateRanks() {
+    BaseNode::updateRanks();
+
+    if (isLeaf()) {
+        subTreeTraffic = ((Server) BaseNode::data).traffic;
+        subTreeSize = 1;
+        return;
+    }
+
+    RankTreeNode* left_node = ((RankTreeNode*)left);
+    RankTreeNode* right_node = ((RankTreeNode*)right);
+
+    int left_size = 0, right_size = 0;
+    int left_traffic = 0, right_traffic = 0;
+
+    if (left != nullptr) {
+        left_size = left_node->subTreeSize;
+        left_traffic = left_node->subTreeTraffic;
+    }
+    if (right != nullptr) {
+        right_size = right_node->subTreeSize;
+        right_traffic = right_node->subTreeTraffic;
+    }
+
+    subTreeSize = left_size + right_size + 1;
+    subTreeTraffic = left_traffic + right_traffic + ((Server) BaseNode::data).traffic;
+}
+
 //-------------------- SERVER RANK TREE IMPLEMENTATION --------------------
 
 static ServerRankTree MergeRankTrees(const ServerRankTree& a, const ServerRankTree& b) {

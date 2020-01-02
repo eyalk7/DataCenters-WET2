@@ -2,17 +2,14 @@
 #define DATACENTERS_WET2_SERVERRANKTREE_H
 
 #include "AVL.h"
-#include "DataCentersManager.h"
+#include "ServersManager.h"
 
-struct ServerKey
+struct ServerKey {
     int traffic;
     ServerID serverId;
 
-    bool operator<(const ServerKey& other) const {
-        if (traffic == other.traffic)
-            return serverId < other.serverId;
-        return traffic < other.traffic;
-    }
+    ServerKey(int traffic, ServerID serverId) : traffic(traffic), serverId(serverId) {}
+    bool operator<(const ServerKey& other) const;
 };
 
 typedef DefTreeNode<ServerKey, Server> BaseNode;
@@ -24,30 +21,7 @@ public:
     RankTreeNode(ServerKey key, Server data, RankTreeNode* parent = nullptr)
     : BaseNode(key, data, parent), subTreeSize(1), subTreeTraffic(data.traffic) {}
 
-    virtual void updateRanks() override {
-        BaseNode::updateRanks();
-
-        if (isLeaf()) {
-            subTreeTraffic = ((Server)BaseNode::data).traffic;
-            subTreeSize = 1;
-            return;
-        }
-
-        int left_size = 0, right_size = 0;
-        int left_traffic = 0, right_traffic = 0;
-
-        if (left != nullptr) {
-            left_size = left->subTreeSize;
-            left_traffic = left->subTreeTraffic;
-        }
-        if (right != nullptr) {
-            right_size = right->subTreeSize;
-            right_traffic = right->subTreeTraffic;
-        }
-
-        subTreeSize = left_size + right_size + 1;
-        subTreeTraffic = left_traffic + right_traffic + ((Server)BaseNode::data).traffic;
-    }
+    virtual void updateRanks() override;
 
 };
 
