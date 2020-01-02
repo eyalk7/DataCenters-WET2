@@ -29,7 +29,7 @@ public:
     bool isLeaf() const;
     bool hasSingleSon() const;
     bool hasTwoSons() const;
-    void updateHeight();
+    virtual void updateRanks();
 
     static void swap(DefTreeNode& A, DefTreeNode& B);
 };
@@ -286,7 +286,7 @@ void AVL<KeyType, DataType, TreeNode>::printTree() {
 template <class KeyType, class DataType, class TreeNode>
 void AVL<KeyType, DataType, TreeNode>::fixTree(TreeNode* root) {
     while (root != dummyRoot) {
-        root->updateHeight();
+        root->updateRanks();
         BalanceSubTree(root);
         root = root->parent;
     }
@@ -351,8 +351,8 @@ void AVL<KeyType, DataType, TreeNode>::rotateRight(TreeNode* root) {
     A->right = B;
     B->parent = A;
 
-    A->updateHeight();
-    B->updateHeight();
+    A->updateRanks();
+    B->updateRanks();
 }
 
 template <class KeyType, class DataType, class TreeNode>
@@ -382,8 +382,8 @@ void AVL<KeyType, DataType, TreeNode>::rotateLeft(TreeNode* root) {
     B->left = A;
     A->parent = B;
 
-    A->updateHeight();
-    B->updateHeight();
+    A->updateRanks();
+    B->updateRanks();
 }
 
 template <class KeyType, class DataType, class TreeNode>
@@ -454,7 +454,37 @@ const typename AVL<KeyType, DataType, TreeNode>::TreeIterator AVL<KeyType, DataT
 
 template <class KeyType, class DataType, class TreeNode>
 const typename AVL<KeyType, DataType, TreeNode>::TreeIterator AVL<KeyType, DataType, TreeNode>::TreeIterator::operator--(int) {
+    // check if reached end (dummyNode) before ++
+    if (curr->parent == nullptr)
+        return *this;
 
+    // doSomething(curr) was done
+
+    // if a left subtree exists
+    if (curr->left != nullptr) {
+        last = curr;
+        curr = curr->left; // go left
+
+        // and then go right as much as possible
+        while (curr->right != nullptr) {
+            last = curr;
+            curr = curr->right;
+        }
+    }
+    else {
+        // no left subtree exists
+        last = curr;
+        curr = curr->parent; // go up
+
+        // if you came back from a left subtree
+        // keep rising until you come back from a right subtree
+        while (last == curr->left) {
+            last = curr;
+            curr = curr->parent;
+        }
+    }
+
+    return *this;   // doSomething(curr) will be done
 }
 
 
@@ -517,7 +547,7 @@ bool DefTreeNode<KeyType, DataType>::hasSingleSon() const {
 }
 
 template<class KeyType, class DataType>
-void DefTreeNode<KeyType, DataType>::updateHeight() {
+void DefTreeNode<KeyType, DataType>::updateRanks() {
     if (isLeaf()) {
         height = 0;
         return;

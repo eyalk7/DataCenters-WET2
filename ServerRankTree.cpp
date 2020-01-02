@@ -1,17 +1,6 @@
 #include "ServerRankTree.h"
 
-typedef DefTreeNode<ServerKey, Server> BaseNode;
-
-//-------------------- RANK TREE NODE FUNCTIONS --------------------
-void RankTreeNode::UpdateRanks() {
-    if (BaseNode::isLeaf()) {
-        subTreeTraffic = data.traffic;
-        subTreeSize = 1;
-    }
-}
-
-
-//-------------------- RANK TREE FUNCTIONS --------------------
+//-------------------- SERVER RANK TREE IMPLEMENTATION --------------------
 
 static ServerRankTree MergeRankTrees(const ServerRankTree& a, const ServerRankTree& b) {
     // alocate two array of "Server" class in size of the trees
@@ -40,18 +29,6 @@ int SumHighestTrafficServers(int k) {
     // else if <:
         // go left, and sum right subtree traffic + curr's traffic
         // k = k - right subtree - 1
-}
-
-void fixTree(RankTreeNode* root) {
-
-}
-
-void rotateRight(RankTreeNode* root) {
-
-}
-
-void rotateLeft(RankTreeNode* root) {
-
 }
 
 static ServerRankTree MakeEmptyTree(int size) {
