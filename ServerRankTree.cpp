@@ -59,13 +59,15 @@ ServerRankTree ServerRankTree::MergeRankTrees(const ServerRankTree& a, const Ser
     for (; aIter != a.end() && bIter != b.end(); i++) {
         if (aIter < bIter) {
             helperArray[i] = *aIter;
+            aIter++;
         } else {
             helperArray[i] = *bIter;
+            bIter++;
         }
     }
 
-    for (; aIter != a.end(); i++) helperArray[i] = *aIter;
-    for (; bIter != b.end(); i++) helperArray[i] = *bIter;
+    for (; aIter != a.end(); i++, aIter++) helperArray[i] = *aIter;
+    for (; bIter != b.end(); i++, bIter++) helperArray[i] = *bIter;
 
     // call MakeEmptyTree
     auto newTree = MakeEmptyTree(newTreeSize);
@@ -85,7 +87,7 @@ ServerRankTree ServerRankTree::MergeRankTrees(const ServerRankTree& a, const Ser
     newTree.InitRanks();
 
     // free the array
-    free(helperArray);
+    delete helperArray;
 
     // return tree
     return newTree;
