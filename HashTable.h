@@ -32,7 +32,6 @@ public:
     bool Contains(int key) const;
     HashTableResult Insert(int key, DataType data);
     HashTableResult Delete(int key);
-    bool Contains(int key);
     static HashTable Merge(const HashTable& table1, const HashTable& table2);
 
 private:
@@ -202,11 +201,6 @@ HashTableResult HashTable<DataType>::Delete(int key) {
     CheckAndResize();   // check load factor to see if the table needs to shrink
 
     return HASH_SUCCESS;
-}
-
-template<class DataType>
-bool HashTable<DataType>::Contains(int key) {
-    return Find(key) != nullptr;
 }
 
 template<class DataType>
