@@ -3,7 +3,6 @@
 
 #include <new>
 #include <cstdlib>
-#include "DataCentersManager.h"
 
 const int INITIAL_SIZE = 11;
 const int RESIZE_FACTOR = 2;    // by how much we enlarge/shrink the dynamic table
@@ -34,6 +33,7 @@ public:
     DataType& Find(int key);
     HashTableResult Insert(int key, DataType data);
     HashTableResult Delete(int key);
+    bool Contains(int key);
     static HashTable Merge(const HashTable& table1, const HashTable& table2);
 
 private:
@@ -51,7 +51,7 @@ private:
 
         explicit List() : size(0), first(nullptr) {}
         ~List();
-        DataType Find(int key) const;
+        DataType& Find(int key) const;
         HashTableResult AddFirst(int key, const DataType& data);
         HashTableResult Remove(int key);
     };
@@ -80,7 +80,7 @@ HashTable<DataType>::List::~List() {
 }
 
 template<class DataType>
-DataType HashTable<DataType>::List::Find(int key) const {
+DataType& HashTable<DataType>::List::Find(int key) const {
     // look for the node with the given key
     Node* ptr = first;
     while (ptr != nullptr) {
@@ -169,6 +169,11 @@ HashTableResult HashTable<DataType>::Delete(int key) {
 }
 
 template<class DataType>
+bool HashTable<DataType>::Contains(int key) {
+    return Find(key) != nullptr;
+}
+
+template<class DataType>
 HashTable<DataType> HashTable<DataType>::Merge(const HashTable<DataType>& table1, const HashTable<DataType>& table2) {
     int count1 = table1.elemCount;
     int count2 = table2.elemCount;
@@ -190,7 +195,7 @@ HashTable<DataType> HashTable<DataType>::Merge(const HashTable<DataType>& table1
 template<class DataType>
 void HashTable<DataType>::CheckAndResize() {
     // check if need to resize
-    int new_size = size;
+    int new_size;
     if (elemCount == GROW_FACTOR * size) {          // if (load factor == grow factor)
         new_size =  size * RESIZE_FACTOR;           // need to grow
 

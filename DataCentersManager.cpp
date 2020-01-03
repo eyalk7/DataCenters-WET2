@@ -14,7 +14,7 @@ ManagerResult DataCentersManager::MergeDataCenters(DataCenterID dataCenter1, Dat
     if (center1InArray == center2InArray) return M_SUCCESS;
 
     // merge the two DataCenters into one new DataCenter
-    DataCenter newDataCenter = ServerManager::MergeServers(dataCenters[center1InArray], dataCenters[center2InArray]);
+    DataCenter newDataCenter = ServersManager::MergeServers(dataCenters[center1InArray], dataCenters[center2InArray]);
 
     // clear the old data centers
     dataCenters[center1InArray] = DataCenter();

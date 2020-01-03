@@ -2,8 +2,7 @@
 #define DATACENTERS_WET2_SERVERSMANAGER_H
 
 #include "HashTable.h"
-#include "ServerRankTree.h"
-#include "DataCentersManager.h"
+#include "AVL.h"
 
 enum ServersManagerResult {
     SM_SUCCESS = 0,
@@ -12,25 +11,18 @@ enum ServersManagerResult {
     SM_INVALID_INPUT = -3
 };
 
-struct Server {
-    ServerID serverID;
-    DataCenterID dataCenterID;
-    int traffic;
-
-    explicit Server(ServerID id = 0, DataCenterID dataCenterId = 0) : serverID(id), dataCenterID(dataCenterId), traffic(0) {}
-    int SetTraffic(int t) { traffic = t; }
-};
-
-class ServerManager {
+class ServersManager {
 public:
+
     ServersManagerResult AddServer(DataCenterID dataCenterID, ServerID serverID);
     ServersManagerResult RemoveServer(ServerID serverID);
     ServersManagerResult SetTraffic(ServerID serverID, int traffic);
     int SumHighestTrafficServers(int k);
     DataCenterID GetDataCenterID(ServerID serverID);
-    static ServerManager MergeServers(const ServerManager& a, const ServerManager& b);
+    static ServersManager MergeServers(const ServersManager& a, const ServersManager& b);
+
 private:
     HashTable<Server> servers;
-    ServerRankTree trafficTree;
+    AVL trafficTree;
 };
 #endif //DATACENTERS_WET2_SERVERSMANAGER_H
