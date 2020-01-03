@@ -146,7 +146,7 @@ ServerRankTree ServerRankTree::MakeEmptyTree(int size) {
         }
 
         // free node
-        free(to_delete);
+        delete to_delete;
     }
 
     // init size of tree to "size"
