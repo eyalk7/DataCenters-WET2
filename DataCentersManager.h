@@ -1,6 +1,5 @@
 #ifndef DATACENTERS_WET2_DATACENTERSMANAGER_H
 #define DATACENTERS_WET2_DATACENTERSMANAGER_H
-#include "HashTable.h"
 #include "UnionFind.h"
 #include "ServersManager.h"
 
@@ -14,7 +13,7 @@ enum ManagerResult {
     M_INVALID_INPUT = -3
 };
 
-typedef ServerManager DataCenter;
+typedef ServersManager DataCenter;
 
 class DataCentersManager {
 public:
@@ -30,8 +29,7 @@ public:
     ManagerResult SumHighestTrafficServers(DataCenterID dataCenterID, int k, int* traffic);
 
 private:
-
-    ServerManager servers;
+    ServersManager servers;
     UnionFind ids;
     DataCenter* dataCenters;
     int dataCenterNum;
