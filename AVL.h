@@ -236,10 +236,10 @@ AVLResult AVL<KeyType, DataType, TreeNode>::remove(const KeyType& key) {
 
 template <class KeyType, class DataType, class TreeNode>
 typename AVL<KeyType, DataType, TreeNode>::TreeIterator AVL<KeyType, DataType, TreeNode>::begin() const {
-    // go all the way left
     TreeIterator iter;
     iter.curr = dummyRoot;
 
+    // go all the way left
     while (iter.curr->left != nullptr) {
         iter.curr = iter.curr->left;
     }
@@ -250,10 +250,10 @@ typename AVL<KeyType, DataType, TreeNode>::TreeIterator AVL<KeyType, DataType, T
 
 template <class KeyType, class DataType, class TreeNode>
 typename AVL<KeyType, DataType, TreeNode>::TreeIterator AVL<KeyType, DataType, TreeNode>::Rbegin() const {
-    // go all the way right
     TreeIterator iter;
     iter.curr = dummyRoot->left;
 
+    // go all the way right
     while (iter.curr->right != nullptr) {
         iter.curr = iter.curr->right;
     }

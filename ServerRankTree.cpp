@@ -3,28 +3,34 @@
 //-------------------- SERVER KEY IMPLEMENTATION --------------------
 
 bool ServerKey::operator<(const ServerKey& other) const {
+    // if same traffic compare by IDs
     if (traffic == other.traffic)
         return serverId < other.serverId;
+
+    // Compare by traffic
     return traffic < other.traffic;
 }
 
 //-------------------- RANK TREE NODE IMPLEMENTATION --------------------
 
 void RankTreeNode::updateRanks() {
-    BaseNode::updateRanks();
+    BaseNode::updateRanks(); // update height of this node
 
+    // If it's a leaf initialize accordingly (same values as in ctor)
     if (isLeaf()) {
         subTreeTraffic = ((Server) BaseNode::data).traffic;
         subTreeSize = 1;
         return;
     }
 
+    // We assume sons are always RankTreeNodes
     RankTreeNode* left_node = ((RankTreeNode*)left);
     RankTreeNode* right_node = ((RankTreeNode*)right);
 
     int left_size = 0, right_size = 0;
     int left_traffic = 0, right_traffic = 0;
 
+    // if left/right son exists, get their ranks
     if (left != nullptr) {
         left_size = left_node->subTreeSize;
         left_traffic = left_node->subTreeTraffic;
@@ -34,11 +40,12 @@ void RankTreeNode::updateRanks() {
         right_traffic = right_node->subTreeTraffic;
     }
 
+    // Calculate this node's rank based on sons' ranks
     subTreeSize = left_size + right_size + 1;
     subTreeTraffic = left_traffic + right_traffic + ((Server) BaseNode::data).traffic;
 }
 
-//-------------------- RANK TREE FUNCTIONS --------------------
+//-------------------- SERVER RANK TREE FUNCTIONS --------------------
 
 ServerRankTree ServerRankTree::MergeRankTrees(const ServerRankTree& a, const ServerRankTree& b) {
     int newTreeSize = a.getSize()+b.getSize();
