@@ -14,6 +14,11 @@ enum ServersManagerResult {
 class ServersManager {
 public:
 
+    ServersManager() = default;
+    ~ServersManager() = default;
+    ServersManager(const ServersManager& other) = default;
+    ServersManager& operator=(const ServersManager& other);
+
     ServersManagerResult AddServer(DataCenterID dataCenterID, ServerID serverID);
     ServersManagerResult RemoveServer(ServerID serverID);
     ServersManagerResult SetTraffic(ServerID serverID, int traffic);

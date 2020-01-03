@@ -1,5 +1,13 @@
 #include "ServersManager.h"
 
+ServersManager& ServersManager::operator=(const ServersManager& other) {
+    servers.~HashTable<Server>();
+    trafficTree.~AVL();
+    servers = other.servers;
+    trafficTree = other.trafficTree;
+    return *this;
+}
+
 ServersManagerResult ServersManager::AddServer(DataCenterID dataCenterID, ServerID serverID) {
     int key = serverID;
     Server server(serverID, dataCenterID);  // traffic is set to 0
@@ -38,16 +46,21 @@ ServersManagerResult ServersManager::SetTraffic(ServerID serverID, int traffic) 
     key.traffic = traffic;
     trafficTree.insert(key, server);    // insert the server in the tree
 
+    return SM_SUCCESS;
 }
 
 int ServersManager::SumHighestTrafficServers(int k) {
-
+    return trafficTree.SumHighestTrafficServers(k);
 }
 
 DataCenterID ServersManager::GetDataCenterID(ServerID serverID) {
-
+    if (!servers.Contains(serverID)) return -1; // server doesn't exist
+    return servers.Find(serverID).dataCenterID;
 }
 
 ServersManager ServersManager::MergeServers(const ServersManager& a, const ServersManager& b) {
-
+    ServersManager manager;
+    manager.servers = HashTable<Server>::Merge(a.servers, b.servers);
+    manager.trafficTree = AVL::MergeRankTrees(a.trafficTree, b.trafficTree);
+    return manager;
 }

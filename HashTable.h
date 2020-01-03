@@ -25,8 +25,11 @@ class HashTable {
 
 public:
     HashTable() : HashTable(INITIAL_SIZE) {}
+    HashTable(const HashTable<DataType>& other);
+    HashTable<DataType>& operator=(const HashTable<DataType>& other);
     ~HashTable() { delete[] lists; }    // Destroy all lists in the array
     DataType& Find(int key);
+    bool Contains(int key) const;
     HashTableResult Insert(int key, DataType data);
     HashTableResult Delete(int key);
     bool Contains(int key);
@@ -48,6 +51,7 @@ private:
         explicit List() : size(0), first(nullptr) {}
         ~List();
         DataType& Find(int key) const;
+        bool Contains(int key) const;
         HashTableResult AddFirst(int key, const DataType& data);
         HashTableResult Remove(int key);
     };
@@ -68,7 +72,6 @@ HashTable<DataType>::List::~List() {
     while (first != nullptr) {
         first = first->next;
         delete to_delete;
-        size--;
         to_delete = first;
     }
 }
@@ -82,19 +85,34 @@ DataType& HashTable<DataType>::List::Find(int key) const {
             return ptr->data;   // return the node's data
         ptr = ptr->next;
     }
-    return nullptr; // node not found (doesn't exist)
+    return first->data; // node not found (behavior not defined)
+}
+
+template<class DataType>
+bool HashTable<DataType>::List::Contains(int key) const {
+        // look for the node with the given key
+        Node* ptr = first;
+        while (ptr != nullptr) {
+            if (ptr->key == key)
+                return true;
+            ptr = ptr->next;
+        }
+        return false;
+    }
 }
 
 template<class DataType>
 HashTableResult HashTable<DataType>::List::AddFirst(int key, const DataType& data) {
     // check if node with given key already exists
-    if (Find(key) != nullptr) return HASH_ALREADY_EXIST;
+    if (Contains(key)) return HASH_ALREADY_EXIST;
 
     // Add a node to the beginning of the list
     Node *node = new Node(key, data);
     node->next = first;
     first = node;
     size++;         // update size
+
+    return HASH_SUCCESS;
 }
 
 template<class DataType>
@@ -124,22 +142,46 @@ HashTableResult HashTable<DataType>::List::Remove(int key) {
     return HASH_SUCCESS;
 }
 //--------------------------- HASH TABLE FUNCTIONS -----------------------
+
+template<class DataType>
+HashTable<DataType>::HashTable(const HashTable<DataType>& other) : HashTable(other.size) {
+    InsertAllElements(other);
+}
+
+template<class DataType>
+HashTable<DataType>& HashTable<DataType>::operator=(const HashTable<DataType>& other) {
+    delete[] lists;
+
+    size = other.size;
+    elemCount = 0;
+    lists = new List[size];
+    InsertAllElements(other);
+
+    return *this;
+}
+
 template<class DataType>
 DataType& HashTable<DataType>::Find(int key) {
     int index = HashFunc(key);  // get the index in the array based on the given key
-    List list = lists[index];   // get the list where the node should be
-    return list.Find(key);      // return the node's data
-                                // returns null if the element isn't in the list
+    List& list = lists[index];   // get the list where the node should be
+    return list.Find(key);      // return the node's data (behavior not defined if key not exist)
+}
+
+template<class DataType>
+bool HashTable<DataType>::Contains(int key) const {
+    int index = HashFunc(key);  // get the index in the array based on the given key
+    List& list = lists[index];   // get the list where the node should be
+    return list.Contains(key);
 }
 
 template<class DataType>
 HashTableResult HashTable<DataType>::Insert(int key, DataType data) {
     int index = HashFunc(key);  // get the index in the array based on the given key
-    List list = lists[index];   // get the list where the node should be
+    List& list = lists[index];   // get the list where the node should be
 
     HashTableResult result = list.AddFirst(key, data);  // add to the list
 
-    if (result == HASH_ALREADY_EXIST) return HASH_ALREADY_EXIST;
+    if (result != HASH_SUCCESS) return result;
 
     elemCount++;        // update element count
     CheckAndResize();   // check load factor to see if the table needs to grow
@@ -150,7 +192,7 @@ HashTableResult HashTable<DataType>::Insert(int key, DataType data) {
 template<class DataType>
 HashTableResult HashTable<DataType>::Delete(int key) {
     int index = HashFunc(key);  // get the index in the array based on the given key
-    List list = lists[index];   // get the list where the node should be
+    List& list = lists[index];   // get the list where the node should be
 
     HashTableResult  result = list.Remove(key); // remove from the list
 
@@ -171,6 +213,8 @@ template<class DataType>
 HashTable<DataType> HashTable<DataType>::Merge(const HashTable<DataType>& table1, const HashTable<DataType>& table2) {
     int count1 = table1.elemCount;
     int count2 = table2.elemCount;
+
+    //if (count1 == 0) return new HashTable
 
     // set the merged table's size based on the total amount of elements in given tables
     int new_size = RESIZE_FACTOR * (count1 + count2);
@@ -205,7 +249,7 @@ void HashTable<DataType>::CheckAndResize() {
 
     delete[] lists;             // delete the List array in this table
     size = new_size;            // update the size
-    InitializeArray(new_size);  // create new List Array
+    lists = new List[new_size];  // create new List Array
 
     InsertAllElements(copy);    // Insert all the elements from the copy
 
