@@ -21,9 +21,12 @@ enum HashTableResult {
 
 template <class DataType>
 class HashTable {
+
+    explicit HashTable(int size) : size(size), elemCount(0) { InitializeArray(size); }
+
 public:
     HashTable() : HashTable(INITIAL_SIZE) {}
-    ~HashTable();
+    ~HashTable() { DestroyArray(); }
     DataType& Find(int key);
     HashTableResult Insert(int key, DataType data);
     HashTableResult Delete(int key);
@@ -52,7 +55,6 @@ private:
     int size, elemCount;
     List* lists;
 
-    explicit HashTable(int size) : size(size), elemCount(0) { InitializeArray(size); }
     int HashFunc(int key) { return (key % size); }
     void CheckAndResize();
     void InitializeArray(int size);
@@ -124,11 +126,6 @@ HashTableResult HashTable<DataType>::List::Remove(int key) {
     return HASH_SUCCESS;
 }
 //--------------------------- HASH TABLE FUNCTIONS -----------------------
-template<class DataType>
-HashTable<DataType>::~HashTable() {
-    DestroyArray();
-}
-
 template<class DataType>
 DataType& HashTable<DataType>::Find(int key) {
     int index = HashFunc(key);

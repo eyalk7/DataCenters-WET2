@@ -18,6 +18,9 @@ struct Server {
     ServerID serverID;
     DataCenterID dataCenterID;
     int traffic;
+
+    Server(ServerID id, DataCenterID dataCenterId) : serverID(id), dataCenterID(dataCenterId), traffic(0) {}
+    int SetTraffic(int t) { traffic = t; }
 };
 
 class ServerManager {

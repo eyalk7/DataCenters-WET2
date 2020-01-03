@@ -2,16 +2,27 @@
 #define DATACENTERS_WET2_SERVERRANKTREE_H
 
 #include "AVL.h"
-#include "DataCentersManager.h"
+#include "ServersManager.h"
 
 struct ServerKey {
     int traffic;
     ServerID serverId;
+
+    ServerKey(int traffic, ServerID serverId) : traffic(traffic), serverId(serverId) {}
+    bool operator<(const ServerKey& other) const;
 };
 
-class RankTreeNode : public DefTreeNode<ServerKey, Server> {
+typedef DefTreeNode<ServerKey, Server> BaseNode;
+
+class RankTreeNode : public BaseNode {
 public:
     int subTreeSize, subTreeTraffic;
+
+    RankTreeNode(ServerKey key, Server data, RankTreeNode* parent = nullptr)
+    : BaseNode(key, data, parent), subTreeSize(1), subTreeTraffic(data.traffic) {}
+
+    virtual void updateRanks() override;
+
 //    RankTreeNode(int traffic) : DefTreeNode<ServerKey, Server>(ServerKey, data,
 //            TreeNode* parent = nullptr) :) daniel is loser
     void UpdateRanks();
@@ -24,9 +35,6 @@ public:
     int SumHighestTrafficServers(int k);
 
 private:
-    void fixTree(RankTreeNode* root);
-    void rotateRight(RankTreeNode* root);
-    void rotateLeft(RankTreeNode* root);
     static ServerRankTree MakeEmptyTree(int size);
     static RankTreeNode* MakeEmptyTreeHelp(int height);
     void InitRanks();
