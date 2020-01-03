@@ -18,10 +18,14 @@ class RankTreeNode : public BaseNode {
 public:
     int subTreeSize, subTreeTraffic;
 
+    // RankTreeNode is initalized as a leaf
+    // Initial Subtree size of a leaf = 1
+    // Initial Subtree traffic = given server's traffic
+    // Parent will be initialized by the AVL
     RankTreeNode(ServerKey key, Server data, RankTreeNode* parent = nullptr)
     : BaseNode(key, data, parent), subTreeSize(1), subTreeTraffic(data.traffic) {}
 
-    virtual void updateRanks() override;
+    void updateRanks() override;
 };
 
 class ServerRankTree : public AVL<ServerKey, Server, RankTreeNode> {
