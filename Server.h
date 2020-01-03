@@ -33,7 +33,6 @@ struct Server {
     int traffic;
 
     explicit Server(ServerID id = 0, DataCenterID dataCenterId = 0) : serverID(id), dataCenterID(dataCenterId), traffic(0) {}
-    int SetTraffic(int t) { traffic = t; }
 };
 
 #endif //DATACENTERS_WET2_SERVER_H
