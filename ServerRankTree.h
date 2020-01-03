@@ -22,10 +22,6 @@ public:
     : BaseNode(key, data, parent), subTreeSize(1), subTreeTraffic(data.traffic) {}
 
     virtual void updateRanks() override;
-
-//    RankTreeNode(int traffic) : DefTreeNode<ServerKey, Server>(ServerKey, data,
-//            TreeNode* parent = nullptr) :) daniel is loser
-    void UpdateRanks();
 };
 
 class ServerRankTree : public AVL<ServerKey, Server, RankTreeNode> {
@@ -38,6 +34,7 @@ private:
     static ServerRankTree MakeEmptyTree(int size);
     static RankTreeNode* MakeEmptyTreeHelp(int height);
     void InitRanks();
+    static void InitRanksHelp(RankTreeNode* curr);
     static int log(int n);
     static int pow(int base, int power);
 };

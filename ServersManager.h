@@ -12,14 +12,12 @@ enum ServersManagerResult {
     SM_INVALID_INPUT = -3
 };
 
-typedef int DataCenterID;
-typedef int ServerID;
 struct Server {
     ServerID serverID;
     DataCenterID dataCenterID;
     int traffic;
 
-    Server(ServerID id, DataCenterID dataCenterId) : serverID(id), dataCenterID(dataCenterId), traffic(0) {}
+    explicit Server(ServerID id = 0, DataCenterID dataCenterId = 0) : serverID(id), dataCenterID(dataCenterId), traffic(0) {}
     int SetTraffic(int t) { traffic = t; }
 };
 

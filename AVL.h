@@ -48,7 +48,6 @@ public:
         bool operator!=(const TreeIterator& other) const;
 
         friend AVL;
-    protected:
         TreeNode *curr, * last;
     };
 
