@@ -4,6 +4,8 @@
 #include "AVL.h"
 #include "ServersManager.h"
 
+class AVL<ServerKey, Server, RankTreeNode>;
+
 struct ServerKey {
     int traffic;
     ServerID serverId;

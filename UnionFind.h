@@ -9,7 +9,6 @@ public:
     explicit UnionFind(int size) : sets(new UnionFindCell[size]), elementsNum(size) {}
     Set Find(int idx);
     Set Union(Set a, Set b);
-    int GetIdx(Set set);
 
 private:
 

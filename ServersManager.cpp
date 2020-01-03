@@ -1,7 +1,11 @@
 #include "ServersManager.h"
 
-ServersManagerResult AddServer(DataCenterID dataCenterID, ServerID serverID) {
+ServersManagerResult ServerManager::AddServer(DataCenterID dataCenterID, ServerID serverID) {
+    ServerRankTree tree;
+    tree.insert(ServerKey(0,0), Server());
 
+    AVL<ServerKey, Server, RankTreeNode> stree;
+    stree.insert(ServerKey(0,0), Server());
 }
 
 ServersManagerResult RemoveServer(ServerID serverID) {

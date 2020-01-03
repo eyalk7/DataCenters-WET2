@@ -32,7 +32,3 @@ Set UnionFind::Union(Set a, Set b) {
 
     return a;
 }
-
-int UnionFind::GetIdx(Set set) {
-    return set;
-}

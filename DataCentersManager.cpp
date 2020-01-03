@@ -1,24 +1,38 @@
 #include "DataCentersManager.h"
 
-DataCentersManager::DataCentersManager(int size) {
-    // initialize UnionFind (by size)
-    // allocate empty Server HashTable
-    // allocate DataCenter array (by size)
+DataCentersManager::~DataCentersManager() {
+
 }
 
 ManagerResult DataCentersManager::MergeDataCenters(DataCenterID dataCenter1, DataCenterID dataCenter2) {
-    // check if id equal
-    // find the two datacenter
-    // check if (find(1) == find(2))
-    // union the groups
+    if (dataCenter1 <= 0 || dataCenter1 > dataCenterNum || dataCenter2 <= 0 || dataCenter2 > dataCenterNum) return M_INVALID_INPUT;
 
-    // merge the dataCenter at find(1) and find(2) in the datacenters array
-    // the merge result you put at the union idx result
-    // free the two old datacetnter
+    // get from union-find the indices of the data centers
+    int center1InArray = ids.Find(dataCenter1), center2InArray = ids.Find(dataCenter2);
+
+    // if they are already united, just return SUCCESS
+    if (center1InArray == center2InArray) return M_SUCCESS;
+
+    // merge the two DataCenters into one new DataCenter
+    DataCenter newDataCenter = ServerManager::MergeServers(dataCenters[center1InArray], dataCenters[center2InArray]);
+
+    // clear the old data centers
+    dataCenters[center1InArray] = DataCenter();
+    dataCenters[center2InArray] = DataCenter();
+
+    // union the two sets in the union-find and get the new index
+    int newIndex = ids.Union(center1InArray, center2InArray);
+
+    // put the new DataCenter in the array
+    dataCenters[newIndex] = newDataCenter;
+
+    return M_SUCCESS;
 }
 
 ManagerResult DataCentersManager::AddServer(DataCenterID dataCenterID, ServerID serverID) {
     // allocate new ServerNode
+    Server newServer(serverID, dataCenterID);
+    
     // insert serverNode to servers hash
         // if already exist return FAILURE
     // find data centerid in union
