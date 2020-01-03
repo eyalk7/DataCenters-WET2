@@ -25,12 +25,19 @@ ServersManagerResult ServersManager::RemoveServer(ServerID serverID) {
 }
 
 ServersManagerResult ServersManager::SetTraffic(ServerID serverID, int traffic) {
+    if (!servers.Contains(serverID)) return SM_FAILURE; // server doesn't exist
+
     Server& server = servers.Find(serverID);
+    ServerKey key(server.traffic, serverID);
 
-   // check if exists
+    if (server.traffic != 0)        // if the server is in the tree
+        trafficTree.remove(key);    // remove it
 
-    ServerKey key(traffic, serverID);
-    trafficTree.insert(key, server);
+    server.traffic = traffic;       // change the server's traffic in the hash table
+
+    key.traffic = traffic;
+    trafficTree.insert(key, server);    // insert the server in the tree
+
 }
 
 int ServersManager::SumHighestTrafficServers(int k) {
