@@ -58,9 +58,9 @@ DataCenterID ServersManager::GetDataCenterID(ServerID serverID) {
     return servers.Find(serverID).dataCenterID;
 }
 
-ServersManager ServersManager::MergeServers(const ServersManager& a, const ServersManager& b) {
-    ServersManager manager;
-    manager.servers = HashTable<Server>::Merge(a.servers, b.servers);
-    manager.trafficTree = AVL::MergeRankTrees(a.trafficTree, b.trafficTree);
-    return manager;
+ServersManager& ServersManager::MergeServers(const ServersManager& a, const ServersManager& b) {
+    auto manager = new ServersManager();
+    manager->servers = HashTable<Server>::Merge(a.servers, b.servers);           // merge hash tables
+    manager->trafficTree = AVL::MergeRankTrees(a.trafficTree, b.trafficTree);    // merge traffic trees
+    return *manager; // return the merged ServersManager
 }

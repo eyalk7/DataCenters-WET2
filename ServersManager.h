@@ -24,7 +24,7 @@ public:
     ServersManagerResult SetTraffic(ServerID serverID, int traffic);
     int SumHighestTrafficServers(int k);
     DataCenterID GetDataCenterID(ServerID serverID);
-    static ServersManager MergeServers(const ServersManager& a, const ServersManager& b);
+    static ServersManager& MergeServers(const ServersManager& a, const ServersManager& b);
 
 private:
     HashTable<Server> servers;
