@@ -17,7 +17,7 @@ public:
     ServersManager() = default;
     ~ServersManager() = default;
     ServersManager(const ServersManager& other) = default;
-    ServersManager& operator=(const ServersManager& other);
+    ServersManager& operator=(const ServersManager& other) = default;
 
     ServersManagerResult AddServer(DataCenterID dataCenterID, ServerID serverID);
     ServersManagerResult RemoveServer(ServerID serverID);

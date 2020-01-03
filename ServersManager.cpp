@@ -1,10 +1,5 @@
 #include "ServersManager.h"
 
-ServersManager& ServersManager::operator=(const ServersManager& other) {
-    servers = other.servers;
-    trafficTree = other.trafficTree;
-    return *this;
-}
 
 ServersManagerResult ServersManager::AddServer(DataCenterID dataCenterID, ServerID serverID) {
     int key = serverID;
