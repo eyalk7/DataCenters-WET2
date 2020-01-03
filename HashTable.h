@@ -2,7 +2,6 @@
 #define DATACENTERS_WET2_HASHTABLE_H
 
 #include <new>
-#include <cstdlib>
 
 const int INITIAL_SIZE = 11;
 const int RESIZE_FACTOR = 2;    // by how much we enlarge/shrink the dynamic table
@@ -14,10 +13,7 @@ const double SHRINK_FACTOR = 0.25;  // the table shrinks when the load factor = 
                                     // bigger than zero and smaller than grow factor
 
 enum HashTableResult {
-    HASH_SUCCESS = 0,
-    HASH_FAILURE = -1,
-    HASH_ALLOCATION_ERROR = -2,
-    HASH_INVALID_INPUT = -3,
+    HASH_SUCCESS,
     HASH_ALREADY_EXIST,
     HASH_NOT_EXIST
 };
@@ -25,11 +21,11 @@ enum HashTableResult {
 template <class DataType>
 class HashTable {
 
-    explicit HashTable(int size) : size(size), elemCount(0) { InitializeArray(size); } // Initialize array of empty lists
+    explicit HashTable(int size) : size(size), elemCount(0), lists(new List[size]) { }
 
 public:
     HashTable() : HashTable(INITIAL_SIZE) {}
-    ~HashTable() { DestroyArray(); }    // Destroy all lists in the array
+    ~HashTable() { delete[] lists; }    // Destroy all lists in the array
     DataType& Find(int key);
     HashTableResult Insert(int key, DataType data);
     HashTableResult Delete(int key);
@@ -61,8 +57,6 @@ private:
 
     int HashFunc(int key) { return (key % size); }
     void CheckAndResize();
-    void InitializeArray(int size);
-    void DestroyArray();
     void InsertAllElements(const HashTable& other);
 };
 
@@ -209,31 +203,13 @@ void HashTable<DataType>::CheckAndResize() {
     auto copy = new HashTable(size);
     copy->InsertAllElements(this);
 
-    DestroyArray();             // delete the List array in this table
+    delete[] lists;             // delete the List array in this table
     size = new_size;            // update the size
     InitializeArray(new_size);  // create new List Array
 
     InsertAllElements(copy);    // Insert all the elements from the copy
 
     delete copy;
-}
-
-template<class DataType>
-void HashTable<DataType>::InitializeArray(int size) {
-    lists = new List[size]; // create the array
-
-    // Initialize all lists in the array
-    for (int i = 0; i < size; i++)
-        lists[i] = new List();
-}
-
-template<class DataType>
-void HashTable<DataType>::DestroyArray() {
-    // Delete all lists in the array
-    for (int i = 0; i < size; i++) {
-        delete lists[i];
-    }
-    delete[] lists; // delete the array itself
 }
 
 template<class DataType>

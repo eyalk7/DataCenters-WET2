@@ -1,9 +1,5 @@
 #include "DataCentersManager.h"
 
-DataCentersManager::~DataCentersManager() {
-    delete dataCenters;
-}
-
 ManagerResult DataCentersManager::MergeDataCenters(DataCenterID dataCenter1, DataCenterID dataCenter2) {
     if (dataCenter1 <= 0 || dataCenter1 > dataCenterNum || dataCenter2 <= 0 || dataCenter2 > dataCenterNum) return M_INVALID_INPUT;
 

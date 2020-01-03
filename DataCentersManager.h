@@ -18,7 +18,7 @@ public:
         ids(size),
         dataCenters(new DataCenter[size]),
         dataCenterNum(size) {};
-    ~DataCentersManager();
+    ~DataCentersManager() { delete[] dataCenters; };
     ManagerResult MergeDataCenters(DataCenterID dataCenter1, DataCenterID dataCenter2);
     ManagerResult AddServer(DataCenterID dataCenterID, ServerID serverID);
     ManagerResult RemoveServer(ServerID serverID);
