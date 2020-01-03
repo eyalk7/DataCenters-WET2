@@ -6,7 +6,7 @@ typedef int Set;
 
 class UnionFind {
 public:
-    explicit UnionFind(int size);
+    explicit UnionFind(int size) : sets(new UnionFindCell[size]), elementsNum(size) {}
     Set Find(int idx);
     Set Union(Set a, Set b);
     int GetIdx(Set set);
@@ -14,6 +14,8 @@ public:
 private:
 
     struct UnionFindCell {
+        UnionFindCell() : parent(IS_ROOT), size(1) {}
+
         int parent;
         int size;
     };

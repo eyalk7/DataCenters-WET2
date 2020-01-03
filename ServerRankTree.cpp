@@ -42,6 +42,7 @@ void RankTreeNode::updateRanks() {
 
 ServerRankTree ServerRankTree::MergeRankTrees(const ServerRankTree& a, const ServerRankTree& b) {
     int newTreeSize = a.getSize()+b.getSize();
+
     // allocate two array of "Server" class in size of the two trees
     auto helperArray = new Server[newTreeSize];
 
@@ -64,12 +65,12 @@ ServerRankTree ServerRankTree::MergeRankTrees(const ServerRankTree& a, const Ser
 
     // do inorder and fill the empty tree
     auto iter = newTree.begin();
-    for (int i=0; iter != newTree.end(); i++, iter++) {
+    for (int j=0; iter != newTree.end(); j++, iter++) {
         // init key to insert
-        auto key = ServerKey(helperArray[i].traffic, helperArray[i].serverID);
+        auto key = ServerKey(helperArray[j].traffic, helperArray[j].serverID);
 
         // insert key & data
-        iter.curr->data = helperArray[i];
+        iter.curr->data = helperArray[j];
         iter.curr->key = key;
     }
 
@@ -84,17 +85,30 @@ ServerRankTree ServerRankTree::MergeRankTrees(const ServerRankTree& a, const Ser
 }
 
 int ServerRankTree::SumHighestTrafficServers(int k) {
-    // if all tree is <= k return all tree traffic
+    // if tree size <= k return all tree traffic
+    if (getSize() <= k) return ((RankTreeNode*)dummyRoot->left)->subTreeTraffic;
 
+    int trafficSum = 0;
+    auto curr = dummyRoot->left;
+    while (k > 0) {
+        if ( ((RankTreeNode*)curr->right)->subTreeSize >= k ) {
+            // no need to add to trafficSum because curr and curr's leftsubtree not counted
+            // no need to decrement k for the same reason
+            // go right
+            curr = curr->right;
 
-    // if rightsub tree count == k
-        //return  sum + rightsub tree traffic
-    // if k == 0 return sum
-    // else if right subtree > k:
-        // go right, don't sum anything
-    // else if <:
-        // go left, and sum right subtree traffic + curr's traffic
-        // k = k - right subtree - 1
+        } else {
+            // add curr's and curr's rightsubtree traffic
+            // decrement k by curr's rightsubtree size + 1
+            // go left
+            trafficSum += curr->data.traffic;
+            trafficSum += ((RankTreeNode*)curr->right)->subTreeTraffic;
+            k -= ( ((RankTreeNode*)curr->right)->subTreeSize + 1 );
+            curr = curr->left;
+        }
+    }
+
+    return trafficSum;
 }
 
 ServerRankTree ServerRankTree::MakeEmptyTree(int size) {
@@ -183,7 +197,8 @@ int ServerRankTree::log(int n) {
 }
 
 int ServerRankTree::pow(int base, int power) {
-    int res = 0;
+    int res = 1;
+    for (; power > 0; power--) res *= base;
 
-
+    return res;
 }
