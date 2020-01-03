@@ -17,7 +17,8 @@ struct Server {
     DataCenterID dataCenterID;
     int traffic;
 
-    explicit Server(ServerID id = 0, DataCenterID dataCenterId = 0) : serverID(id), dataCenterID(dataCenterId), traffic(0) {}
+    Server() : serverID(0), dataCenterID(0), traffic(0) {}
+    Server(ServerID id, DataCenterID dataCenterId) : serverID(id), dataCenterID(dataCenterId), traffic(0) {}
     int SetTraffic(int t) { traffic = t; }
 };
 

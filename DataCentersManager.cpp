@@ -32,7 +32,8 @@ ManagerResult DataCentersManager::MergeDataCenters(DataCenterID dataCenter1, Dat
 ManagerResult DataCentersManager::AddServer(DataCenterID dataCenterID, ServerID serverID) {
     // allocate new ServerNode
     Server newServer(serverID, dataCenterID);
-    
+    Server serv(0,0);
+
     // insert serverNode to servers hash
         // if already exist return FAILURE
     // find data centerid in union
