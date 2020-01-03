@@ -53,6 +53,8 @@ public:
     };
 
     AVL();
+    AVL& operator=(const AVL& other);
+
     ~AVL();
     TreeIterator find(const ServerKey& key) const;
     AVLResult insert(const ServerKey& key, const Server& data);
@@ -73,6 +75,7 @@ private:
     void BalanceSubTree(TreeNode* root);
     void rotateRight(TreeNode* root);
     void rotateLeft(TreeNode* root);
+    void DestroyTree();
 
     static AVL MakeEmptyTree(int size);
     static TreeNode* MakeEmptyTreeHelp(int height);

@@ -2,7 +2,6 @@
 #define DATACENTERS_WET2_HASHTABLE_H
 
 #include <new>
-#include <cstdlib>
 
 const int INITIAL_SIZE = 11;
 const int RESIZE_FACTOR = 2;    // by how much we enlarge/shrink the dynamic table
@@ -25,10 +24,13 @@ enum HashTableResult {
 template <class DataType>
 class HashTable {
 
-    explicit HashTable(int size) : size(size), elemCount(0) { InitializeArray(size); } // Initialize array of empty lists
+    explicit HashTable(int size);
 
 public:
     HashTable() : HashTable(INITIAL_SIZE) {}
+    HashTable(const HashTable<DataType>& other);
+    HashTable<DataType>& operator=(const HashTable<DataType>& other);
+
     ~HashTable() { DestroyArray(); }    // Destroy all lists in the array
     DataType& Find(int key);
     HashTableResult Insert(int key, DataType data);
@@ -130,6 +132,30 @@ HashTableResult HashTable<DataType>::List::Remove(int key) {
     return HASH_SUCCESS;
 }
 //--------------------------- HASH TABLE FUNCTIONS -----------------------
+
+
+template<class DataType>
+HashTable<DataType>::HashTable(int size)  : size(size), elemCount(0) {
+    InitializeArray(size); // Initialize array of empty lists
+}
+
+template<class DataType>
+HashTable<DataType>::HashTable(const HashTable<DataType>& other) : HashTable(other.size) {
+    InsertAllElements(other);
+}
+
+template<class DataType>
+HashTable<DataType>& HashTable<DataType>::operator=(const HashTable<DataType>& other) {
+    delete[] lists;
+
+    size = other.size;
+    elemCount = 0;
+    lists = new List[size];
+    InsertAllElements(other);
+
+    return *this;
+}
+
 template<class DataType>
 DataType& HashTable<DataType>::Find(int key) {
     int index = HashFunc(key);  // get the index in the array based on the given key
@@ -177,6 +203,8 @@ template<class DataType>
 HashTable<DataType> HashTable<DataType>::Merge(const HashTable<DataType>& table1, const HashTable<DataType>& table2) {
     int count1 = table1.elemCount;
     int count2 = table2.elemCount;
+
+    //if (count1 == 0) return new HashTable
 
     // set the merged table's size based on the total amount of elements in given tables
     int new_size = RESIZE_FACTOR * (count1 + count2);

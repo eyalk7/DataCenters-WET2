@@ -180,42 +180,18 @@ AVL::AVL() : size(0) {
     dummyRoot = new TreeNode(ServerKey(0, 0), Server());
 }
 
-AVL::~AVL() {
-    if (size != 0) {
-        TreeIterator iter = begin();
-        auto ptr = iter.curr;
-        TreeNode* last = nullptr;
+AVL& AVL::operator=(const AVL& other) {
+    DestroyTree();
 
-        // PostOrder Traversal to delete all nodes
-        while (ptr != dummyRoot) {
-            while (ptr->left != nullptr) {
-                ptr = ptr->left;
-            }
+    size = other.size;
+    dummyRoot = other.dummyRoot;
 
-            while (ptr->right != nullptr) {
-                ptr = ptr->right;
-
-                while (ptr->left != nullptr) {
-                    ptr = ptr->left;
-                }
-            }
-
-            last = ptr->parent;
-            if (ptr->isLeftSubtree()) {
-                last->left = nullptr;
-            }
-            else {
-                last->right = nullptr;
-            }
-            delete ptr;
-
-            ptr = last;
-        }
-    }
-
-    delete dummyRoot;
+    return *this;
 }
 
+AVL::~AVL() {
+    DestroyTree();
+}
 
 typename AVL::TreeIterator AVL::find(const ServerKey& key) const {
     TreeNode* ptr = dummyRoot->left;
@@ -540,6 +516,42 @@ void AVL::rotateLeft(TreeNode* root) {
 
     A->updateRanks();
     B->updateRanks();
+}
+
+void AVL::DestroyTree() {
+    if (size != 0) {
+        TreeIterator iter = begin();
+        auto ptr = iter.curr;
+        TreeNode* last = nullptr;
+
+        // PostOrder Traversal to delete all nodes
+        while (ptr != dummyRoot) {
+            while (ptr->left != nullptr) {
+                ptr = ptr->left;
+            }
+
+            while (ptr->right != nullptr) {
+                ptr = ptr->right;
+
+                while (ptr->left != nullptr) {
+                    ptr = ptr->left;
+                }
+            }
+
+            last = ptr->parent;
+            if (ptr->isLeftSubtree()) {
+                last->left = nullptr;
+            }
+            else {
+                last->right = nullptr;
+            }
+            delete ptr;
+
+            ptr = last;
+        }
+    }
+
+    delete dummyRoot;
 }
 
 AVL AVL::MakeEmptyTree(int size) {
