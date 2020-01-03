@@ -1,8 +1,6 @@
 #include "ServersManager.h"
 
 ServersManager& ServersManager::operator=(const ServersManager& other) {
-    servers.~HashTable<Server>();
-    trafficTree.~AVL();
     servers = other.servers;
     trafficTree = other.trafficTree;
     return *this;
@@ -58,9 +56,9 @@ DataCenterID ServersManager::GetDataCenterID(ServerID serverID) {
     return servers.Find(serverID).dataCenterID;
 }
 
-ServersManager& ServersManager::MergeServers(const ServersManager& a, const ServersManager& b) {
-    auto manager = new ServersManager();
-    manager->servers = HashTable<Server>::Merge(a.servers, b.servers);           // merge hash tables
-    manager->trafficTree = AVL::MergeRankTrees(a.trafficTree, b.trafficTree);    // merge traffic trees
-    return *manager; // return the merged ServersManager
+ServersManager ServersManager::MergeServers(const ServersManager& a, const ServersManager& b) {
+    ServersManager manager;
+    manager.servers = HashTable<Server>::Merge(a.servers, b.servers);           // merge hash tables
+    manager.trafficTree = AVL::MergeRankTrees(a.trafficTree, b.trafficTree);    // merge traffic trees
+    return manager; // return the merged ServersManager
 }

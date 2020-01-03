@@ -180,6 +180,28 @@ AVL::AVL() : size(0) {
     dummyRoot = new TreeNode(ServerKey(0, 0), Server());
 }
 
+AVL::AVL(const AVL& other) : size(other.size) {
+    auto newTree = MakeEmptyTree(size);
+
+    // do inorder and fill the empty tree
+    auto iter = newTree.begin(), other_iter = other.begin();
+    for (; iter != newTree.end() && other_iter != other.end(); iter++, other_iter++) {
+        Server server = *other_iter; // get server to copy
+
+        // init key to insert
+        auto key = ServerKey(server.traffic, server.serverID);
+
+        // insert key & data
+        iter.curr->data = server;
+        iter.curr->key = key;
+    }
+
+    newTree.InitRanks();    // initialize ranks throughout the tree
+
+    dummyRoot = newTree.dummyRoot;
+}
+
+
 AVL& AVL::operator=(const AVL& other) {
     DestroyTree();
 
@@ -364,7 +386,7 @@ AVL AVL::MergeRankTrees(const AVL& a, const AVL& b) {
     for (; bIter != b.end(); i++, bIter++) helperArray[i] = *bIter;
 
     // call MakeEmptyTree
-    auto newTree = MakeEmptyTree(newTreeSize);
+    AVL newTree(MakeEmptyTree(newTreeSize));
 
     // do inorder and fill the empty tree
     auto iter = newTree.begin();
@@ -519,7 +541,7 @@ void AVL::rotateLeft(TreeNode* root) {
 }
 
 void AVL::DestroyTree() {
-    if (size != 0) {
+    if (size != 0 && dummyRoot->left != nullptr) {
         TreeIterator iter = begin();
         auto ptr = iter.curr;
         TreeNode* last = nullptr;
@@ -562,6 +584,7 @@ AVL AVL::MakeEmptyTree(int size) {
     // construct new tree and init dummy->left = root;
     AVL newTree;
     newTree.dummyRoot->left = root;
+    root->parent = newTree.dummyRoot;
 
     // go backward inorder, and delete leaves until the skeleton size reaches the wanted size
     auto iter = newTree.Rbegin();
@@ -598,11 +621,18 @@ TreeNode* AVL::MakeEmptyTreeHelp(int height) {
     newNode->left = MakeEmptyTreeHelp(height-1);
     newNode->right = MakeEmptyTreeHelp(height-1);
 
+    // set children's parent pointer
+    if (newNode->left != nullptr)
+        newNode->left->parent = newNode;
+
+    if (newNode->right != nullptr)
+        newNode->right->parent = newNode;
+
     return newNode;
 }
 
 void AVL::InitRanks() {
-    InitRanksHelp( (TreeNode*)dummyRoot->left );
+    InitRanksHelp(dummyRoot->left);
 }
 
 void AVL::InitRanksHelp(TreeNode* curr) {

@@ -53,6 +53,7 @@ public:
     };
 
     AVL();
+    AVL(const AVL& other);
     AVL& operator=(const AVL& other);
 
     ~AVL();

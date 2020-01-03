@@ -20,11 +20,8 @@ enum HashTableResult {
 
 template <class DataType>
 class HashTable {
-
-    explicit HashTable(int size) : size(size), elemCount(0), lists(new List[size]) { }
-
 public:
-    HashTable() : HashTable(INITIAL_SIZE) {}
+    HashTable() : size(INITIAL_SIZE), elemCount(0), lists(new List[INITIAL_SIZE]) {}
     HashTable(const HashTable<DataType>& other);
     HashTable<DataType>& operator=(const HashTable<DataType>& other);
     ~HashTable() { delete[] lists; }    // Destroy all lists in the array
@@ -58,8 +55,9 @@ private:
     int size, elemCount;
     List* lists;
 
+    explicit HashTable(int size) : size(size), elemCount(0), lists(new List[size]) { }
     int HashFunc(int key) { return (key % size); }
-    void CheckAndResize();
+    void Resize(int new_size);
     void InsertAllElements(const HashTable& other);
 };
 
@@ -142,7 +140,7 @@ HashTableResult HashTable<DataType>::List::Remove(int key) {
 //--------------------------- HASH TABLE FUNCTIONS -----------------------
 
 template<class DataType>
-HashTable<DataType>::HashTable(const HashTable<DataType>& other) : HashTable(other.size) {
+HashTable<DataType>::HashTable(const HashTable<DataType>& other) : size(other.size), elemCount(0), lists(new List[other.size]) {
     InsertAllElements(other);
 }
 
@@ -182,7 +180,9 @@ HashTableResult HashTable<DataType>::Insert(int key, DataType data) {
     if (result != HASH_SUCCESS) return result;
 
     elemCount++;        // update element count
-    CheckAndResize();   // check load factor to see if the table needs to grow
+    if (elemCount == GROW_FACTOR * size) {      // if load factor == grow factor
+        Resize(size * RESIZE_FACTOR);           // need to grow
+    }
 
     return HASH_SUCCESS;
 }
@@ -197,7 +197,9 @@ HashTableResult HashTable<DataType>::Delete(int key) {
     if (result == HASH_NOT_EXIST) return HASH_NOT_EXIST;
 
     elemCount--;        // update element count
-    CheckAndResize();   // check load factor to see if the table needs to shrink
+    if (elemCount == SHRINK_FACTOR * size) {    // if load factor == shrink factor
+        Resize(size / RESIZE_FACTOR);           // need to shrink
+    }
 
     return HASH_SUCCESS;
 }
@@ -207,16 +209,21 @@ HashTable<DataType> HashTable<DataType>::Merge(const HashTable<DataType>& table1
     int count1 = table1.elemCount;
     int count2 = table2.elemCount;
 
-    //if (count1 == 0) return new HashTable
+    HashTable<DataType>* new_table;
+    if (count1 == 0) { // table 1 is empty
+        new_table = new HashTable(table2); // return copy of table 2
+    } else if (count2 == 0) { // table 2 is empty
+        new_table = new HashTable(table1);  // return copy of table 1
+    } else { // none of the tables are empty
+        // set the merged table's size based on the total amount of elements in given tables
+        int new_size = RESIZE_FACTOR * (count1 + count2);
 
-    // set the merged table's size based on the total amount of elements in given tables
-    int new_size = RESIZE_FACTOR * (count1 + count2);
+        new_table = new HashTable(new_size);
 
-    auto new_table = new HashTable(new_size);
-
-    // insert all elements from both tables into the new table
-    new_table->InsertAllElements(table1);
-    new_table->InsertAllElements(table2);
+        // insert all elements from both tables into the new table
+        new_table->InsertAllElements(table1);
+        new_table->InsertAllElements(table2);
+    }
 
     return *new_table;
 }
@@ -224,25 +231,15 @@ HashTable<DataType> HashTable<DataType>::Merge(const HashTable<DataType>& table1
 //--------------------------- PRIVATE TABLE FUNCTIONS -----------------------
 
 template<class DataType>
-void HashTable<DataType>::CheckAndResize() {
-    // check if need to resize
-    int new_size;
-    if (elemCount == GROW_FACTOR * size) {          // if (load factor == grow factor)
-        new_size =  size * RESIZE_FACTOR;           // need to grow
-
-    } else if (elemCount == SHRINK_FACTOR * size) { // if (load factor == shirnk factor)
-        new_size = size / RESIZE_FACTOR;            // need to shrink
-    } else {
-        return;                                     // no need to resize
-    }
-
+void HashTable<DataType>::Resize(int new_size) {
     // make a copy of this table
     auto copy = new HashTable(size);
     copy->InsertAllElements(*this);
 
     delete[] lists;             // delete the List array in this table
     size = new_size;            // update the size
-    lists = new List[new_size];  // create new List Array
+    elemCount = 0;              // reset element count
+    lists = new List[new_size]; // create new List Array
 
     InsertAllElements(*copy);    // Insert all the elements from the copy
 
@@ -255,7 +252,7 @@ void HashTable<DataType>::InsertAllElements(const HashTable& other) {
 
     // For every element in the given table
     for (int i = 0; i < other.size; i++) {
-        List list = other_table[i];
+        List& list = other_table[i];
         Node* ptr = list.first;
         while (ptr != nullptr) {
             Insert(ptr->key, ptr->data); // insert (a copy) to this table

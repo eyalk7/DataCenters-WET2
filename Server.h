@@ -33,6 +33,8 @@ struct Server {
     int traffic;
 
     explicit Server(ServerID id = 0, DataCenterID dataCenterId = 0) : serverID(id), dataCenterID(dataCenterId), traffic(0) {}
+    Server(const Server& other) = default;
+    Server& operator=(const Server& other) = default;
 };
 
 #endif //DATACENTERS_WET2_SERVER_H
