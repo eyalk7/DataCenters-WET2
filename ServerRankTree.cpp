@@ -48,7 +48,7 @@ void RankTreeNode::updateRanks() {
 //-------------------- SERVER RANK TREE FUNCTIONS --------------------
 
 ServerRankTree ServerRankTree::MergeRankTrees(const ServerRankTree& a, const ServerRankTree& b) {
-    int newTreeSize = a.getSize()+b.getSize();
+    int newTreeSize = a.size + b.size;
 
     // allocate two array of "Server" class in size of the two trees
     auto helperArray = new Server[newTreeSize];
@@ -93,12 +93,13 @@ ServerRankTree ServerRankTree::MergeRankTrees(const ServerRankTree& a, const Ser
 
 int ServerRankTree::SumHighestTrafficServers(int k) {
     // if tree size <= k return all tree traffic
-    if (getSize() <= k) return ((RankTreeNode*)dummyRoot->left)->subTreeTraffic;
+    if (size <= k) return ((RankTreeNode*)dummyRoot->left)->subTreeTraffic;
 
     int trafficSum = 0;
     auto curr = dummyRoot->left;
     while (k > 0) {
-        if ( ((RankTreeNode*)curr->right)->subTreeSize >= k ) {
+        RankTreeNode* right_node = ((RankTreeNode*)curr->right);
+        if (right_node->subTreeSize >= k) {
             // no need to add to trafficSum because curr and curr's leftsubtree not counted
             // no need to decrement k for the same reason
             // go right
@@ -109,8 +110,8 @@ int ServerRankTree::SumHighestTrafficServers(int k) {
             // decrement k by curr's rightsubtree size + 1
             // go left
             trafficSum += curr->data.traffic;
-            trafficSum += ((RankTreeNode*)curr->right)->subTreeTraffic;
-            k -= ( ((RankTreeNode*)curr->right)->subTreeSize + 1 );
+            trafficSum += right_node->subTreeTraffic;
+            k -= (right_node->subTreeSize + 1);
             curr = curr->left;
         }
     }
@@ -176,7 +177,7 @@ void ServerRankTree::InitRanksHelp(RankTreeNode* curr) {
     InitRanksHelp((RankTreeNode*)curr->left);
     InitRanksHelp((RankTreeNode*)curr->right);
 
-    ((RankTreeNode*)curr)->updateRanks();
+    curr->updateRanks();
 }
 
 int ServerRankTree::log(int n) {

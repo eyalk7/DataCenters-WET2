@@ -59,7 +59,6 @@ public:
     TreeIterator begin() const;
     TreeIterator end() const;
     TreeIterator Rbegin() const;
-    int getSize() const;
 
     void printTree();
 
@@ -268,11 +267,6 @@ typename AVL<KeyType, DataType, TreeNode>::TreeIterator AVL<KeyType, DataType, T
     TreeIterator iter;
     iter.curr = dummyRoot;
     return iter;
-}
-
-template <class KeyType, class DataType, class TreeNode>
-int AVL<KeyType, DataType, TreeNode>::getSize() const {
-    return size;
 }
 
 template <class KeyType, class DataType, class TreeNode>
