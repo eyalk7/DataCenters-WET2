@@ -48,7 +48,7 @@ int ServersManager::SumHighestTrafficServers(int k) {
 }
 
 DataCenterID ServersManager::GetDataCenterID(ServerID serverID) {
-    if (!servers.Contains(serverID)) return -1; // server doesn't exist
+    if (!servers.Contains(serverID)) return 0; // server doesn't exist
     return servers.Find(serverID).dataCenterID;
 }
 

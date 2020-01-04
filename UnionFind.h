@@ -7,6 +7,7 @@ typedef int Set;
 class UnionFind {
 public:
     explicit UnionFind(int size) : sets(new UnionFindCell[size]), elementsNum(size) {}
+    ~UnionFind() { delete[] sets; }
     Set Find(int idx);
     Set Union(Set a, Set b);
 

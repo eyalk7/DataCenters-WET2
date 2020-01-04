@@ -1,7 +1,7 @@
 #include "DataCentersManager.h"
 
 ManagerResult DataCentersManager::MergeDataCenters(DataCenterID dataCenter1, DataCenterID dataCenter2) {
-    if (dataCenter1 < 0 || dataCenter1 > dataCenterNum || dataCenter2 < 0 || dataCenter2 > dataCenterNum) return M_INVALID_INPUT;
+    if (dataCenter1 <= 0 || dataCenter1 > dataCenterNum || dataCenter2 <= 0 || dataCenter2 > dataCenterNum) return M_INVALID_INPUT;
 
     // get from union-find the indices of the data centers
     int center1InArray = ids.Find(dataCenter1), center2InArray = ids.Find(dataCenter2);
@@ -17,7 +17,6 @@ ManagerResult DataCentersManager::MergeDataCenters(DataCenterID dataCenter1, Dat
     dataCenters[center1InArray] = dummy;
     dataCenters[center2InArray] = dummy;
 
-
     // union the two sets in the union-find and get the new index
     int newIndex = ids.Union(center1InArray, center2InArray);
 
@@ -28,7 +27,7 @@ ManagerResult DataCentersManager::MergeDataCenters(DataCenterID dataCenter1, Dat
 }
 
 ManagerResult DataCentersManager::AddServer(DataCenterID dataCenterID, ServerID serverID) {
-    if (dataCenterID < 0 || dataCenterID > dataCenterNum || serverID <= 0) return M_INVALID_INPUT;
+    if (dataCenterID <= 0 || dataCenterID > dataCenterNum || serverID <= 0) return M_INVALID_INPUT;
 
     // insert server to the main ServersManager, if already exist return FAILURE
     if (servers.AddServer(dataCenterID, serverID) != SM_SUCCESS) return M_FAILURE;
@@ -45,6 +44,7 @@ ManagerResult DataCentersManager::RemoveServer(ServerID serverID) {
 
     // get data center ID
     int dataCenterID = servers.GetDataCenterID(serverID);
+    if (dataCenterID == 0) return M_FAILURE;    // server doesn't exist
     int dataCenterIDX = ids.Find(dataCenterID);
 
     // remove the server from the main ServerManager
@@ -64,6 +64,7 @@ ManagerResult DataCentersManager::SetTraffic(ServerID serverID, int traffic) {
 
     // get data center ID
     int dataCenterID = servers.GetDataCenterID(serverID);
+    if (dataCenterID == 0) return M_FAILURE;    // server doesn't exist
     int dataCenterIDX = ids.Find(dataCenterID);
 
     // set traffic in DataCenter
@@ -73,9 +74,9 @@ ManagerResult DataCentersManager::SetTraffic(ServerID serverID, int traffic) {
 }
 
 ManagerResult DataCentersManager::SumHighestTrafficServers(DataCenterID dataCenterID, int k, int* traffic) {
-    if (dataCenterID < -1 || dataCenterID > dataCenterNum || k < 0 || !traffic) return M_INVALID_INPUT;
+    if (dataCenterID < 0 || dataCenterID > dataCenterNum || k < 0 || !traffic) return M_INVALID_INPUT;
 
-    if (dataCenterID == -1) { // in that case we need to get the sum from the main ServerManager
+    if (dataCenterID == 0) { // in that case we need to get the sum from the main ServerManager
         *traffic = servers.SumHighestTrafficServers(k);
     } else {
         int dataCenterIDX = ids.Find(dataCenterID);

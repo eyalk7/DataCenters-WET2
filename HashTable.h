@@ -209,23 +209,22 @@ HashTable<DataType> HashTable<DataType>::Merge(const HashTable<DataType>& table1
     int count1 = table1.elemCount;
     int count2 = table2.elemCount;
 
-    HashTable<DataType>* new_table;
-    if (count1 == 0) { // table 1 is empty
-        new_table = new HashTable(table2); // return copy of table 2
-    } else if (count2 == 0) { // table 2 is empty
-        new_table = new HashTable(table1);  // return copy of table 1
+    if (count1 == 0) {                          // table 1 is empty
+        HashTable<DataType> new_table(table2);  // return copy of table 2
+        return new_table;
+    } else if (count2 == 0) {                   // table 2 is empty
+        HashTable<DataType> new_table(table1);  // return copy of table 1
+        return new_table;
     } else { // none of the tables are empty
         // set the merged table's size based on the total amount of elements in given tables
         int new_size = RESIZE_FACTOR * (count1 + count2);
-
-        new_table = new HashTable(new_size);
+        HashTable<DataType> new_table(new_size);
 
         // insert all elements from both tables into the new table
-        new_table->InsertAllElements(table1);
-        new_table->InsertAllElements(table2);
+        new_table.InsertAllElements(table1);
+        new_table.InsertAllElements(table2);
+        return new_table;
     }
-
-    return *new_table;
 }
 
 //--------------------------- PRIVATE TABLE FUNCTIONS -----------------------
@@ -233,7 +232,7 @@ HashTable<DataType> HashTable<DataType>::Merge(const HashTable<DataType>& table1
 template<class DataType>
 void HashTable<DataType>::Resize(int new_size) {
     // make a copy of this table
-    auto copy = new HashTable(size);
+    auto copy = new HashTable(new_size);
     copy->InsertAllElements(*this);
 
     delete[] lists;             // delete the List array in this table

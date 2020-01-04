@@ -2,6 +2,7 @@
 
 Set UnionFind::Find(int idx) {
     // go to idx's root
+    idx--;
     int root = idx;
     while (sets[root].parent != IS_ROOT) root = sets[root].parent;
 

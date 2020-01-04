@@ -396,21 +396,28 @@ AVL AVL::MergeRankTrees(const AVL& a, const AVL& b) {
 
 int AVL::SumHighestTrafficServers(int k) {
     // if tree size <= k return all tree traffic
-    if (size <= k) return ((TreeNode*)dummyRoot->left)->subTreeTraffic;
+    if (size <= k) return dummyRoot->left->subTreeTraffic;
 
     int trafficSum = 0;
-    auto curr = dummyRoot->left;
-    while (k > 0) {
-        TreeNode* right_node = ((TreeNode*)curr->right);
-        if (right_node->subTreeSize >= k) {
-            // no need to add to trafficSum because curr and curr's leftsubtree not counted
+    TreeNode* curr = dummyRoot->left;
+
+    while (k > 0) { // maybe add: (curr != nullptr) as a precaution ?
+        TreeNode* right_node = curr->right;
+        if (right_node == nullptr) {
+            // no right subtree
+            // add this node's traffic and continue left
+            trafficSum += curr->data.traffic;
+            k -= 1;
+            curr = curr->left;
+        }
+        else if (right_node->subTreeSize >= k) {
+            // no need to add to trafficSum because curr and curr's left subtree not counted
             // no need to decrement k for the same reason
             // go right
-            curr = curr->right;
-
+            curr = right_node;
         } else {
-            // add curr's and curr's rightsubtree traffic
-            // decrement k by curr's rightsubtree size + 1
+            // add curr's and curr's right subtree traffic
+            // decrement k by curr's right subtree size + 1
             // go left
             trafficSum += curr->data.traffic;
             trafficSum += right_node->subTreeTraffic;

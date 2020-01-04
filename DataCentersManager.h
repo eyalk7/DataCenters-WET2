@@ -15,9 +15,11 @@ typedef ServersManager DataCenter;
 class DataCentersManager {
 public:
     explicit DataCentersManager(int size) :
+        servers(),
         ids(size),
-        dataCenters(new DataCenter[size]),
-        dataCenterNum(size) {};
+        dataCenterNum(size),
+        dataCenters(new DataCenter[size]) {};
+
     ~DataCentersManager() { delete[] dataCenters; };
     ManagerResult MergeDataCenters(DataCenterID dataCenter1, DataCenterID dataCenter2);
     ManagerResult AddServer(DataCenterID dataCenterID, ServerID serverID);
@@ -28,9 +30,8 @@ public:
 private:
     ServersManager servers;
     UnionFind ids;
-    DataCenter* dataCenters;
     int dataCenterNum;
-
+    DataCenter* dataCenters;
 };
 
 #endif //DATACENTERS_WET2_DATACENTERSMANAGER_H
