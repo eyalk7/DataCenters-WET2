@@ -82,10 +82,14 @@ Server& AVL::TreeIterator::operator*() const {
     return (curr->data);
 }
 
+bool AVL::TreeIterator::isEnd() const {
+    // check if reached end (dummyNode)
+    return curr->parent == nullptr;
+}
 
 const typename AVL::TreeIterator AVL::TreeIterator::operator++(int) {
     // check if reached end (dummyNode) before ++
-    if (curr->parent == nullptr)
+    if (isEnd())
         return *this;
 
     // doSomething(curr) was done
@@ -120,8 +124,8 @@ const typename AVL::TreeIterator AVL::TreeIterator::operator++(int) {
 
 
 const typename AVL::TreeIterator AVL::TreeIterator::operator--(int) {
-    // check if reached end (dummyNode) before ++
-    if (curr->parent == nullptr)
+    // check if reached end (dummyNode) before --
+    if (isEnd())
         return *this;
 
     // doSomething(curr) was done
@@ -144,7 +148,7 @@ const typename AVL::TreeIterator AVL::TreeIterator::operator--(int) {
 
         // if you came back from a left subtree
         // keep rising until you come back from a right subtree
-        while (last == curr->left) {
+        while (!isEnd() && last == curr->left) {
             last = curr;
             curr = curr->parent;
         }
@@ -153,14 +157,12 @@ const typename AVL::TreeIterator AVL::TreeIterator::operator--(int) {
     return *this;   // doSomething(curr) will be done
 }
 
-
-
 bool AVL::TreeIterator::operator<(const TreeIterator& other) const {
-    if (this->curr->parent == nullptr)
-        return false; // if this is the end
+    if (isEnd())
+        return false; // if this is the dummy, it's smaller
 
-    if (other.curr->parent == nullptr)
-        return true; // everything is smaller than the end
+    if (other.isEnd())
+        return true; // other is the dummy so it's smaller
 
     // compare keys with key's operator <
     return (curr->key < other.curr->key);
@@ -181,33 +183,15 @@ AVL::AVL() : size(0) {
 }
 
 AVL::AVL(const AVL& other) : size(other.size) {
-    auto newTree = MakeEmptyTree(size);
-
-    // do inorder and fill the empty tree
-    auto iter = newTree.begin(), other_iter = other.begin();
-    for (; iter != newTree.end() && other_iter != other.end(); iter++, other_iter++) {
-        Server server = *other_iter; // get server to copy
-
-        // init key to insert
-        auto key = ServerKey(server.traffic, server.serverID);
-
-        // insert key & data
-        iter.curr->data = server;
-        iter.curr->key = key;
-    }
-
-    newTree.InitRanks();    // initialize ranks throughout the tree
-
-    dummyRoot = newTree.dummyRoot;
+    dummyRoot = new TreeNode(ServerKey(0, 0), Server());
+    CopyTree(other);
 }
 
 
 AVL& AVL::operator=(const AVL& other) {
     DestroyTree();
-
-    size = other.size;
-    dummyRoot = other.dummyRoot;
-
+    dummyRoot = new TreeNode(ServerKey(0, 0), Server());
+    CopyTree(other);
     return *this;
 }
 
@@ -386,7 +370,8 @@ AVL AVL::MergeRankTrees(const AVL& a, const AVL& b) {
     for (; bIter != b.end(); i++, bIter++) helperArray[i] = *bIter;
 
     // call MakeEmptyTree
-    AVL newTree(MakeEmptyTree(newTreeSize));
+    AVL newTree;
+    newTree.InitializeAsEmptyTree(newTreeSize);
 
     // do inorder and fill the empty tree
     auto iter = newTree.begin();
@@ -540,6 +525,27 @@ void AVL::rotateLeft(TreeNode* root) {
     B->updateRanks();
 }
 
+// this function is ONLY called from the COPY CTOR and ASSIGNMENT OPERATOR
+void AVL::CopyTree(const AVL& other) {
+    InitializeAsEmptyTree(other.size);
+
+    // do inorder and fill the empty tree
+    auto iter = begin(), other_iter = other.begin();
+    for (; iter != end() && other_iter != other.end(); iter++, other_iter++) {
+        Server server(*other_iter); // get server to copy
+
+        // init key to insert
+        auto key = ServerKey(server.traffic, server.serverID);
+
+        // copy key, data and ranks
+        iter.curr->key = key;
+        iter.curr->data = server;
+        iter.curr->height = other_iter.curr->height;
+        iter.curr->subTreeSize = other_iter.curr->subTreeSize;
+        iter.curr->subTreeTraffic = other_iter.curr->subTreeTraffic;
+    }
+}
+
 void AVL::DestroyTree() {
     if (size != 0 && dummyRoot->left != nullptr) {
         TreeIterator iter = begin();
@@ -576,21 +582,20 @@ void AVL::DestroyTree() {
     delete dummyRoot;
 }
 
-AVL AVL::MakeEmptyTree(int size) {
+void AVL::InitializeAsEmptyTree(int init_size) {
     // make skeleton of empty tree in proper size
-    int newTreeHeight = log(size);
+    int newTreeHeight = log(init_size);
     TreeNode* root = MakeEmptyTreeHelp(newTreeHeight);
 
-    // construct new tree and init dummy->left = root;
-    AVL newTree;
-    newTree.dummyRoot->left = root;
-    root->parent = newTree.dummyRoot;
+    // initialize Root pointers
+    dummyRoot->left = root;
+    root->parent = dummyRoot;
 
     // go backward inorder, and delete leaves until the skeleton size reaches the wanted size
-    auto iter = newTree.Rbegin();
-    for (int newTreeSize = pow(2, newTreeHeight+1) - 1; newTreeSize > size; newTreeSize--) {
+    auto iter = Rbegin();
+    for (int newTreeSize = pow(2, newTreeHeight+1) - 1; newTreeSize > init_size; newTreeSize--) {
         // go to the next leaf
-        while ( !iter.curr->isLeaf() ) iter--;
+        while (!iter.curr->isLeaf()) iter--;
         auto to_delete = iter.curr;
         iter--;
 
@@ -606,9 +611,7 @@ AVL AVL::MakeEmptyTree(int size) {
     }
 
     // init size of tree to "size"
-    newTree.size = size;
-
-    return newTree;
+    size = init_size;
 }
 
 TreeNode* AVL::MakeEmptyTreeHelp(int height) {

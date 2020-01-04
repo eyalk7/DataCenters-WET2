@@ -3,7 +3,7 @@
 
 #include <new>
 
-const int INITIAL_SIZE = 11;
+const int INITIAL_SIZE = 3;
 const int RESIZE_FACTOR = 2;    // by how much we enlarge/shrink the dynamic table
 
 const double GROW_FACTOR = 1.0; // the table grows when the load factor = grow factor
@@ -177,7 +177,7 @@ HashTableResult HashTable<DataType>::Insert(int key, DataType data) {
 
     HashTableResult result = list.AddFirst(key, data);  // add to the list
 
-    if (result != HASH_SUCCESS) return result;
+    if (result == HASH_ALREADY_EXIST) return result;
 
     elemCount++;        // update element count
     if (elemCount == GROW_FACTOR * size) {      // if load factor == grow factor

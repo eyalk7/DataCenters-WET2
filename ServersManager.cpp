@@ -37,7 +37,8 @@ ServersManagerResult ServersManager::SetTraffic(ServerID serverID, int traffic) 
     server.traffic = traffic;       // change the server's traffic in the hash table
 
     key.traffic = traffic;
-    trafficTree.insert(key, server);    // insert the server in the tree
+    if (traffic != 0)                       // if the given traffic is zero we dont add it to the tree
+        trafficTree.insert(key, server);    // insert the server in the tree
 
     return SM_SUCCESS;
 }

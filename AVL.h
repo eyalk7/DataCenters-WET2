@@ -42,6 +42,7 @@ public:
     public:
         TreeIterator() : curr(nullptr), last(nullptr) {};
         Server& operator*() const;
+        bool isEnd() const;
         const TreeIterator operator++(int);
         const TreeIterator operator--(int);
         bool operator<(const TreeIterator& other) const;
@@ -76,9 +77,11 @@ private:
     void BalanceSubTree(TreeNode* root);
     void rotateRight(TreeNode* root);
     void rotateLeft(TreeNode* root);
+
+    void CopyTree(const AVL& other); // ONLY called from the copy ctor and assignment operator
     void DestroyTree();
 
-    static AVL MakeEmptyTree(int size);
+    void InitializeAsEmptyTree(int init_size);
     static TreeNode* MakeEmptyTreeHelp(int height);
     void InitRanks();
     static void InitRanksHelp(TreeNode* curr);

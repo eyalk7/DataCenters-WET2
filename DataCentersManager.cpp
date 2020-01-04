@@ -13,8 +13,10 @@ ManagerResult DataCentersManager::MergeDataCenters(DataCenterID dataCenter1, Dat
     DataCenter newDataCenter = ServersManager::MergeServers(dataCenters[center1InArray], dataCenters[center2InArray]);
 
     // clear the old data centers
-    dataCenters[center1InArray] = DataCenter();
-    dataCenters[center2InArray] = DataCenter();
+    DataCenter dummy;
+    dataCenters[center1InArray] = dummy;
+    dataCenters[center2InArray] = dummy;
+
 
     // union the two sets in the union-find and get the new index
     int newIndex = ids.Union(center1InArray, center2InArray);
