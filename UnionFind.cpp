@@ -1,8 +1,9 @@
 #include "UnionFind.h"
 
 Set UnionFind::Find(int idx) {
+    idx--; // offset for the array index
+
     // go to idx's root
-    idx--;
     int root = idx;
     while (sets[root].parent != IS_ROOT) root = sets[root].parent;
 
