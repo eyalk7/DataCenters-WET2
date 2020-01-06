@@ -395,6 +395,8 @@ AVL AVL::MergeRankTrees(const AVL& a, const AVL& b) {
 }
 
 int AVL::SumHighestTrafficServers(int k) {
+    if (size == 0) return 0; // empty tree
+
     // if tree size <= k return all tree traffic
     if (size <= k) return dummyRoot->left->subTreeTraffic;
 
