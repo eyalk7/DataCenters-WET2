@@ -430,7 +430,6 @@ int AVL::SumHighestTrafficServers(int k) {
 
     return trafficSum;
 }
-
 //-------------------------PRIVATE AVL FUNCTIONS-------------------------
 
 void AVL::fixTree(TreeNode* root) {

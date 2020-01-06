@@ -1,11 +1,7 @@
 #ifndef DATACENTERS_WET1_AVL_H
 #define DATACENTERS_WET1_AVL_H
 
-#include <iostream>
 #include "Server.h"
-
-using namespace std;
-#define COUNT 10 // used in tree print function
 
 enum AVLResult { AVL_SUCCESS, AVL_FAILURE, AVL_INVALID_INPUT, AVL_ALREADY_EXIST, AVL_NOT_EXIST };
 

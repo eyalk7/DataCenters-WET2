@@ -11,7 +11,6 @@ const double GROW_FACTOR = 1.0; // the table grows when the load factor = grow f
 
 const double SHRINK_FACTOR = 0.25;  // the table shrinks when the load factor = shrink factor
                                     // bigger than zero and smaller than grow factor
-
 enum HashTableResult {
     HASH_SUCCESS,
     HASH_ALREADY_EXIST,
@@ -21,7 +20,8 @@ enum HashTableResult {
 template <class DataType>
 class HashTable {
 public:
-    HashTable() : size(INITIAL_SIZE), elemCount(0), lists(new List[INITIAL_SIZE]) {}
+
+    HashTable() : size(INITIAL_SIZE), elemCount(0), lists(new List[INITIAL_SIZE]) { }
     HashTable(const HashTable<DataType>& other);
     HashTable<DataType>& operator=(const HashTable<DataType>& other);
     ~HashTable() { delete[] lists; }    // Destroy all lists in the array
@@ -48,7 +48,7 @@ private:
         ~List();
         DataType& Find(int key) const;
         bool Contains(int key) const;
-        HashTableResult AddFirst(int key, const DataType& data);
+        void AddFirst(int key, const DataType& data);
         HashTableResult Remove(int key);
     };
 
@@ -58,6 +58,7 @@ private:
     explicit HashTable(int size) : size(size), elemCount(0), lists(new List[size]) { }
     int HashFunc(int key) { return (key % size); }
     void Resize(int new_size);
+    HashTableResult InsertNoCheck(int key, DataType data);
     void InsertAllElements(const HashTable& other);
 };
 
@@ -98,17 +99,14 @@ bool HashTable<DataType>::List::Contains(int key) const {
 }
 
 template<class DataType>
-HashTableResult HashTable<DataType>::List::AddFirst(int key, const DataType& data) {
-    // check if node with given key already exists
-    if (Contains(key)) return HASH_ALREADY_EXIST;
-
+void HashTable<DataType>::List::AddFirst(int key, const DataType& data) {
     // Add a node to the beginning of the list
     Node *node = new Node(key, data);
     node->next = first;
     first = node;
     size++;         // update size
 
-    return HASH_SUCCESS;
+    //return HASH_SUCCESS;
 }
 
 template<class DataType>
@@ -172,19 +170,10 @@ bool HashTable<DataType>::Contains(int key) {
 
 template<class DataType>
 HashTableResult HashTable<DataType>::Insert(int key, DataType data) {
-    int index = HashFunc(key);  // get the index in the array based on the given key
-    List& list = lists[index];   // get the list where the node should be
+    // check if node with given key already exists
+    if (Contains(key)) return HASH_ALREADY_EXIST;
 
-    HashTableResult result = list.AddFirst(key, data);  // add to the list
-
-    if (result == HASH_ALREADY_EXIST) return result;
-
-    elemCount++;        // update element count
-    if (elemCount == GROW_FACTOR * size) {      // if load factor == grow factor
-        Resize(size * RESIZE_FACTOR);           // need to grow
-    }
-
-    return HASH_SUCCESS;
+    return InsertNoCheck(key, data);
 }
 
 template<class DataType>
@@ -197,8 +186,8 @@ HashTableResult HashTable<DataType>::Delete(int key) {
     if (result == HASH_NOT_EXIST) return HASH_NOT_EXIST;
 
     elemCount--;        // update element count
-    if (elemCount == SHRINK_FACTOR * size) {    // if load factor == shrink factor
-        Resize(size / RESIZE_FACTOR);           // need to shrink
+    if ((double)elemCount == SHRINK_FACTOR * (double)size) {    // if load factor == shrink factor
+        Resize(size / RESIZE_FACTOR);                           // need to shrink
     }
 
     return HASH_SUCCESS;
@@ -246,6 +235,23 @@ void HashTable<DataType>::Resize(int new_size) {
 }
 
 template<class DataType>
+HashTableResult HashTable<DataType>::InsertNoCheck(int key, DataType data) {
+    int index = HashFunc(key);  // get the index in the array based on the given key
+    List& list = lists[index];   // get the list where the node should be
+    // HashTableResult result =
+    list.AddFirst(key, data);  // add to the list
+
+    //if (result != HASH_ALREADY_EXIST) return result;
+
+    elemCount++;        // update element count
+    if ((double)elemCount == GROW_FACTOR * (double)size) {  // if load factor == grow factor
+        Resize(size * RESIZE_FACTOR);                       // need to grow
+    }
+
+    return HASH_SUCCESS;
+}
+
+template<class DataType>
 void HashTable<DataType>::InsertAllElements(const HashTable& other) {
     List* other_table = other.lists;
 
@@ -254,7 +260,7 @@ void HashTable<DataType>::InsertAllElements(const HashTable& other) {
         List& list = other_table[i];
         Node* ptr = list.first;
         while (ptr != nullptr) {
-            Insert(ptr->key, ptr->data); // insert (a copy) to this table
+            InsertNoCheck(ptr->key, ptr->data); // insert (a copy) to this table
             ptr = ptr->next;
         }
     }
