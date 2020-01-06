@@ -401,9 +401,9 @@ int AVL::SumHighestTrafficServers(int k) {
     int trafficSum = 0;
     TreeNode* curr = dummyRoot->left;
 
-    while (k > 0) { // maybe add: (curr != nullptr) as a precaution ?
+    while (k > 0) {
         TreeNode* right_node = curr->right;
-        if (right_node == nullptr) {
+        if (right_node == nullptr) { // right subtree size = 0
             // no right subtree
             // add this node's traffic and continue left
             trafficSum += curr->data.traffic;
@@ -547,10 +547,9 @@ void AVL::CopyTree(const AVL& other) {
         // copy key, data and ranks
         iter.curr->key = key;
         iter.curr->data = server;
-        iter.curr->height = other_iter.curr->height;
-        iter.curr->subTreeSize = other_iter.curr->subTreeSize;
-        iter.curr->subTreeTraffic = other_iter.curr->subTreeTraffic;
     }
+
+    InitRanks();
 }
 
 void AVL::DestroyTree() {
